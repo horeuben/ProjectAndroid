@@ -1,0 +1,53 @@
+{
+"attractions":[
+  {
+    "name": "Marina Bay Sands",
+    "id": "ChIJm3G3-AYZ2jERfByv0oRiOwA"
+  },
+  {
+    "name": "Singapore Flyer",
+    "id": "ChIJ_WTZdKoZ2jERK024PgmtUrs"
+  },
+  {"name":"Vivo City",
+  "id":"ChIJK7xLl1gZ2jERP_GdUY9XNLo"
+  },
+  {
+    "name": "Resorts World Sentosa",
+    "id": "ChIJLR75v_0b2jERJrR28stYwMU"
+  },
+  {"name":"Buddha Tooth Relic Temple",
+    "id":"ChIJ0bwmznIZ2jEREOCMNggtIBk"
+  },{
+  "name":"Singapore Zoo",
+  "id":"ChIJr9wqENkT2jERkRs7pMj6FLQ"
+},
+  {
+    "name": "The Cat Cafe",
+    "id": "id1"
+  },{
+  "name":"Animal Concerns Research & Education Society ACRES",
+  "id":"id2"
+  },{
+  "name":"Society for the Prevention of Cruelty to Animals SPCA",
+  "id":"id3"
+  },{
+  "name":"Save Our Street Dogs SOSD Singapore",
+  "id":"id4"
+  },{
+  "name":"Oasis Second Chance Animal Shelter OSCAS",
+  "id":"id5"
+  },{
+  "name":"Animal Lovers League ALL",
+  "id":"id6"
+  },{
+  "name":"Causes for Animals CAS",
+  "id":"id7"
+  },{
+  "name":"Action for Singapore Dogs ASD",
+  "id":"id8"
+  },{
+  "name":"The House Rabbit Society of Singapore HRSS",
+  "id":"id9"
+  }
+]
+}
