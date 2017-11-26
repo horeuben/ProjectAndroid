@@ -1,10 +1,12 @@
 package reuben.projectandroid.Activities;
 
+import android.app.ProgressDialog;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -66,7 +68,6 @@ public class AttractionDescription extends AppCompatActivity implements
     private GoogleApiClient googleApiClient;
     private LatLng attrChosenCoord;
 
-
     private ToggleButton addAttrToIti;
     private ItineraryDatabaseHandler itineraryDatabaseHandler=new ItineraryDatabaseHandler(AttractionDescription.this);
     private String AttrName;
@@ -78,9 +79,11 @@ public class AttractionDescription extends AppCompatActivity implements
         //connnect the google API client so you can get the place fro the place id
         googleApiClient = new GoogleApiClient.Builder(AttractionDescription.this)
                 .addApi(Places.GEO_DATA_API)
+                .enableAutoManage(this, this)
+                .addOnConnectionFailedListener(this)
                 .addConnectionCallbacks(this)
                 .build();
-
+        new GetPlaceTask().execute();
         //get name, place id and desc from bundle, as well as description
         Bundle b = getIntent().getExtras();
         AttrName = b.getString("atrName");
@@ -89,11 +92,30 @@ public class AttractionDescription extends AppCompatActivity implements
         Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.stockpic1);
         //Gets Place by placeid but not working-->always returns 0 results
         //get the place object from the ID
-        PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
-                .getPlaceById(googleApiClient, place_id);
-        //query the place ID and returns a bunch of results
-        Log.i(LOG_TAG, "here?");
-        placeResult.setResultCallback(placeResultCallback);
+//        PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
+//                .getPlaceById(googleApiClient, place_id);
+//        //query the place ID and returns a bunch of results
+//        Log.i(LOG_TAG, "here?");
+//        placeResult.setResultCallback(placeResultCallback);
+
+        while(!googleApiClient.isConnected()){
+            Toast.makeText(getApplicationContext(),"Place connectingis : "+googleApiClient.isConnecting(),Toast.LENGTH_SHORT).show();
+
+        }
+        Places.GeoDataApi.getPlaceById(googleApiClient, place_id).setResultCallback(new ResultCallback<PlaceBuffer>() {
+            @Override
+            public void onResult(PlaceBuffer places) {
+                Toast.makeText(getApplicationContext(),"im here",Toast.LENGTH_SHORT).show();
+                if(places.getStatus().isSuccess()) {
+                    attractionChosen = places.get(0);
+                }else{
+                    attractionChosen = null;
+                    Toast.makeText(getApplicationContext(),"attraction is null",Toast.LENGTH_SHORT).show();
+                }
+                // release the PlaceBuffer to prevent a memory leak
+                places.release();
+            }
+        });
 
         attractionImage = (ImageView) findViewById(R.id.attraction_image);
         //using stock pic currently
@@ -103,6 +125,13 @@ public class AttractionDescription extends AppCompatActivity implements
         textViewAdd = (TextView) findViewById(R.id.textView_add);
         textViewNo = (TextView) findViewById(R.id.textView_no);
         textViewDesc = (TextView) findViewById(R.id.textView_desc);
+        if(attractionChosen!=null) {
+            textViewNo.setText(attractionChosen.getPhoneNumber());
+            textViewAdd.setText(attractionChosen.getAddress());
+        }else{
+            textViewNo.setText("cant get");
+            textViewAdd.setText("cant get");
+        }
         textViewDesc.setText(desc);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -145,7 +174,7 @@ public class AttractionDescription extends AppCompatActivity implements
         public void onResult(@NonNull PlaceBuffer places) {
             if (!places.getStatus().isSuccess()){
                 Log.i(LOG_TAG, "not succeffult on result");
-                Toast.makeText(AttractionDescription.this,"notsuccessul",Toast.LENGTH_SHORT);
+                Toast.makeText(AttractionDescription.this,"notsuccessul",Toast.LENGTH_SHORT).show();
                 return;
             }
             else if (places.getCount()>0){
@@ -183,5 +212,39 @@ public class AttractionDescription extends AppCompatActivity implements
         Log.e(LOG_TAG, "Google Places API connection suspended.");
 
     }
+    private class GetPlaceTask extends AsyncTask<Void, Void, Void> {
+        ProgressDialog asyncDialog = new ProgressDialog(AttractionDescription.this);
+        String typeStatus;
 
+
+        @Override
+        protected void onPreExecute() {
+            //set message of the dialog
+            asyncDialog.setMessage("Loading");
+            //show dialog
+            asyncDialog.show();
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            googleApiClient.connect();
+            boolean a = googleApiClient.isConnected();
+            while(!a){
+//                Toast.makeText(getApplicationContext(),"Still connecting",Toast.LENGTH_SHORT).show();
+                a = googleApiClient.isConnected();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            //hide the dialog
+            asyncDialog.dismiss();
+
+            super.onPostExecute(result);
+        }
+
+    }
 }
