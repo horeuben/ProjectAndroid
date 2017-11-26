@@ -2,25 +2,30 @@ package reuben.projectandroid.Fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.method.TextKeyListener;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.InputStream;
 import java.util.List;
 
 import reuben.projectandroid.Activities.AttractionDescription;
-import reuben.projectandroid.Activities.MainActivity;
 import reuben.projectandroid.Adapters.AttractionAdapter;
 import reuben.projectandroid.Database.Attraction;
 import reuben.projectandroid.Database.DatabaseHandler;
@@ -43,12 +48,15 @@ public class AttractionListFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private AutoCompleteTextView searchBar;
+    private ArrayAdapter searchBarAdapter;
     private ListView listView;
     List<Attraction> attractions;
     private OnFragmentInteractionListener mListener;
     public static AttractionAdapter adapter;
     private static Parcelable state;
     private DatabaseHandler db;
+    private List<String> attractionList;
 
     public AttractionListFragment() {
         // Required empty public constructor
@@ -87,22 +95,49 @@ public class AttractionListFragment extends Fragment {
         attractions = db.getAttractions();
         if(attractions.size()==0){
             Attraction a = new Attraction();
-            a.setName("Marina Bay Sands"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_mbs)); a.setPlaceid("placeholder"); a.setType(Attraction.AttractionType.HOTEL);
+            a.setName("Marina Bay Sands"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_mbs)); a.setPlaceid("ChIJm3G3-AYZ2jERfByv0oRiOwA"); a.setType(Attraction.AttractionType.HOTEL);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Singapore Flyer"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_sflyer)); a.setPlaceid("placeholder12"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("Singapore Flyer"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_sflyer)); a.setPlaceid("ChIJ_WTZdKoZ2jERK024PgmtUrs"); a.setType(Attraction.AttractionType.LOCAL_SEE);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Vivo City"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_vivo)); a.setPlaceid("placeholder1"); a.setType(Attraction.AttractionType.LOCAL_MALL);
+            a.setName("Vivo City"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_vivo)); a.setPlaceid("ChIJK7xLl1gZ2jERP_GdUY9XNLo"); a.setType(Attraction.AttractionType.LOCAL_MALL);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Resorts World Sentosa"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_rws)); a.setPlaceid("placeholder3"); a.setType(Attraction.AttractionType.HOTEL);
+            a.setName("Resorts World Sentosa"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_rws)); a.setPlaceid("ChIJLR75v_0b2jERJrR28stYwMU"); a.setType(Attraction.AttractionType.HOTEL);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Buddha Tooth Relic Temple"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_btrt)); a.setPlaceid("placeholder4"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("Buddha Tooth Relic Temple"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_btrt)); a.setPlaceid("ChIJ0bwmznIZ2jEREOCMNggtIBk"); a.setType(Attraction.AttractionType.LOCAL_SEE);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Zoo"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_zoo)); a.setPlaceid("placeholder5"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("Singapore Zoo"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_zoo)); a.setPlaceid("ChIJr9wqENkT2jERkRs7pMj6FLQ"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            db.createAttraction(a);
+            a = new Attraction();
+            a.setName("The Cat Cafe"); a.setDescription("Meow meow"); a.setPlaceid("id1"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            db.createAttraction(a);
+            a = new Attraction();
+            a.setName("Animal Concerns Research & Education Society ACRES"); a.setDescription("placeholder1"); a.setPlaceid("id2"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            db.createAttraction(a);
+            a = new Attraction();
+            a.setName("Society for the Prevention of Cruelty to Animals SPCA"); a.setDescription("placeholder2"); a.setPlaceid("id3"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            db.createAttraction(a);
+            a = new Attraction();
+            a.setName("Save Our Street Dogs SOSD Singapore"); a.setDescription("placedholder3"); a.setPlaceid("id4"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            db.createAttraction(a);
+            a = new Attraction();
+            a.setName("Oasis Second Chance Animal Shelter OSCAS"); a.setDescription("placedholder4"); a.setPlaceid("id5"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            db.createAttraction(a);
+            a = new Attraction();
+            a.setName("Animal Lovers League ALL"); a.setDescription("placedholder5"); a.setPlaceid("id6"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            db.createAttraction(a);
+            a = new Attraction();
+            a.setName("Causes for Animals CAS"); a.setDescription("placedholder6"); a.setPlaceid("id7"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            db.createAttraction(a);
+            a = new Attraction();
+            a.setName("Action for Singapore Dogs ASD"); a.setDescription("placedholder7"); a.setPlaceid("id8"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            db.createAttraction(a);
+            a = new Attraction();
+            a.setName("The House Rabbit Society of Singapore HRSS"); a.setDescription("placedholder8"); a.setPlaceid("id9"); a.setType(Attraction.AttractionType.LOCAL_SEE);
             db.createAttraction(a);
             attractions = db.getAttractions();
         }
@@ -121,7 +156,66 @@ public class AttractionListFragment extends Fragment {
             }
 
         });
+        searchBar=(AutoCompleteTextView) rootView.findViewById(R.id.autoCompleteTextView);
+        Log.i("AttractionListFrag","here");
+        //get internal JSON storage
+        //TODO: encountering problems its raw
+        try{
+            JSONObject obj= new JSONObject(loadJSONFromRaw());
+            JSONArray m_jArry = obj.getJSONArray("attractions");
+            Log.i("AttractionListFrag",String.valueOf(m_jArry.length()));
+            for (int i=0; i<m_jArry.length();i++){
+                JSONObject jo = m_jArry.getJSONObject(i);
+                String placeName = jo.getString("name");
+                Log.i("AttractionListFrag",placeName);
+                attractionList.add(placeName);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+
+        //attractionList=db.attrNameList();
+        //get a list of only attraction names
+        searchBarAdapter = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1,attractionList);
+        Log.i("AttractionListFrag","here1");
+        searchBar.setAdapter(searchBarAdapter);
+        //suggestion will appear after 1 character is entered
+        searchBar.setThreshold(1);
+
+        searchBar.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String placeSelected = (String) adapterView.getItemAtPosition(i);
+                //find index of the attraction selected
+                Integer placeSelectedIndex = 0;
+                for (Attraction a : attractions){
+                    if (a.getName().equals(placeSelected)){
+                        placeSelectedIndex=attractions.indexOf(a);
+                    }
+                }
+                //sets up intent
+                Intent autoCompIntent = new Intent(getActivity(),AttractionDescription.class);
+                autoCompIntent.putExtra("atrName",placeSelected);
+                autoCompIntent.putExtra("atrDesc",attractions.get(placeSelectedIndex).getDescription());
+                autoCompIntent.putExtra("atrType",attractions.get(placeSelectedIndex).getType());
+                autoCompIntent.putExtra("atrPlaceid",attractions.get(placeSelectedIndex).getPlaceid()); //use this to getplacebyid
+                startActivity(autoCompIntent);
+                //clears the searchbar
+                searchBar.setText("");
+
+            }
+
+        });
+
+
         return rootView;
+
+
+
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -181,5 +275,25 @@ public class AttractionListFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    public String loadJSONFromRaw(){
+        String json = null;
+        try{
+            InputStream is= getResources().openRawResource(R.raw.attraction_details);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            Log.i("attractionListFragment","here3");
+            json = new String(buffer, "UTF-8");
+        } catch (Exception ex){
+            ex.printStackTrace();
+            Log.i("attractionListFragment","here4");
+            return null;
+        }
+        Log.i("attractionListFragment","json"+"is"+json);
+        return json;
+
     }
 }

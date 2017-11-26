@@ -40,6 +40,13 @@
                 app:layout_collapseParallaxMultiplier="0.5"
                 app:srcCompat="@drawable/stockpic1" />
 
+            <ToggleButton
+                android:id="@+id/addAttraction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOn="Delete"
+                android:textOff="Add" />
+
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
     <android.support.v4.widget.NestedScrollView
