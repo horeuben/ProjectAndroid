@@ -19,6 +19,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -40,6 +41,10 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.GeoDataApi;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.PlacePhotoMetadata;
+import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
+import com.google.android.gms.location.places.PlacePhotoMetadataResult;
+import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -67,15 +72,21 @@ public class AttractionDescription extends AppCompatActivity implements
     private Place attractionChosen;
     private GoogleApiClient googleApiClient;
     private LatLng attrChosenCoord;
-
+    private String place_id;
     private ToggleButton addAttrToIti;
     private ItineraryDatabaseHandler itineraryDatabaseHandler=new ItineraryDatabaseHandler(AttractionDescription.this);
     private String AttrName;
     private List<ItineraryItem> itineraryItemList;
+    private int height,width;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attraction_description);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        height = displayMetrics.heightPixels;
+        width = displayMetrics.widthPixels;
         //connnect the google API client so you can get the place fro the place id
         googleApiClient = new GoogleApiClient.Builder(AttractionDescription.this)
                 .addApi(Places.GEO_DATA_API)
@@ -83,12 +94,12 @@ public class AttractionDescription extends AppCompatActivity implements
                 .addOnConnectionFailedListener(this)
                 .addConnectionCallbacks(this)
                 .build();
-        new GetPlaceTask().execute();
+
         //get name, place id and desc from bundle, as well as description
         Bundle b = getIntent().getExtras();
         AttrName = b.getString("atrName");
         String desc = b.getString("atrDesc");
-        String place_id = b.getString("atrPlaceid");
+        place_id = b.getString("atrPlaceid");
         Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.stockpic1);
         //Gets Place by placeid but not working-->always returns 0 results
         //get the place object from the ID
@@ -98,25 +109,6 @@ public class AttractionDescription extends AppCompatActivity implements
 //        Log.i(LOG_TAG, "here?");
 //        placeResult.setResultCallback(placeResultCallback);
 
-        while(!googleApiClient.isConnected()){
-            Toast.makeText(getApplicationContext(),"Place connectingis : "+googleApiClient.isConnecting(),Toast.LENGTH_SHORT).show();
-
-        }
-        Places.GeoDataApi.getPlaceById(googleApiClient, place_id).setResultCallback(new ResultCallback<PlaceBuffer>() {
-            @Override
-            public void onResult(PlaceBuffer places) {
-                Toast.makeText(getApplicationContext(),"im here",Toast.LENGTH_SHORT).show();
-                if(places.getStatus().isSuccess()) {
-                    attractionChosen = places.get(0);
-                }else{
-                    attractionChosen = null;
-                    Toast.makeText(getApplicationContext(),"attraction is null",Toast.LENGTH_SHORT).show();
-                }
-                // release the PlaceBuffer to prevent a memory leak
-                places.release();
-            }
-        });
-
         attractionImage = (ImageView) findViewById(R.id.attraction_image);
         //using stock pic currently
         attractionImage.setImageBitmap(image);
@@ -125,20 +117,14 @@ public class AttractionDescription extends AppCompatActivity implements
         textViewAdd = (TextView) findViewById(R.id.textView_add);
         textViewNo = (TextView) findViewById(R.id.textView_no);
         textViewDesc = (TextView) findViewById(R.id.textView_desc);
-        if(attractionChosen!=null) {
-            textViewNo.setText(attractionChosen.getPhoneNumber());
-            textViewAdd.setText(attractionChosen.getAddress());
-        }else{
-            textViewNo.setText("cant get");
-            textViewAdd.setText("cant get");
-        }
+
         textViewDesc.setText(desc);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.attraction_bar);
 
         collapsingToolbarLayout.setTitle(AttrName);
-
+        new GetPlaceTask().execute();
 
     }
 
@@ -168,32 +154,6 @@ public class AttractionDescription extends AppCompatActivity implements
         }
     };
 
-    private ResultCallback<PlaceBuffer> placeResultCallback
-            =new ResultCallback<PlaceBuffer>() {
-        @Override
-        public void onResult(@NonNull PlaceBuffer places) {
-            if (!places.getStatus().isSuccess()){
-                Log.i(LOG_TAG, "not succeffult on result");
-                Toast.makeText(AttractionDescription.this,"notsuccessul",Toast.LENGTH_SHORT).show();
-                return;
-            }
-            else if (places.getCount()>0){
-                attractionChosen = places.get(0);
-                CharSequence attributions = places.getAttributions();
-                textViewAdd.setText(Html.fromHtml((String) attractionChosen.getAddress()));
-                textViewNo.setText(Html.fromHtml((String)attractionChosen.getPhoneNumber()));
-                attrChosenCoord = attractionChosen.getLatLng();
-            }
-            else{
-                //TODO: why isnt it returning anything?
-                Log.i(LOG_TAG, String.valueOf(places.getCount()));
-                Log.i(LOG_TAG, "GG");
-            }
-            places.release();
-            //choose the first answer
-
-        }
-    };
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -234,6 +194,27 @@ public class AttractionDescription extends AppCompatActivity implements
 //                Toast.makeText(getApplicationContext(),"Still connecting",Toast.LENGTH_SHORT).show();
                 a = googleApiClient.isConnected();
             }
+            Places.GeoDataApi.getPlaceById(googleApiClient, place_id).setResultCallback(new ResultCallback<PlaceBuffer>() {
+                @Override
+                public void onResult(PlaceBuffer places) {
+                    if(places.getStatus().isSuccess()) {
+                        attractionChosen = places.get(0);
+                        String no = attractionChosen.getPhoneNumber().toString();
+                        String addr = attractionChosen.getAddress().toString();
+                        if (no.equals(""))textViewNo.setText("Not available");
+                        else textViewNo.setText(no);
+                        if (addr.equals("")) textViewAdd.setText("Not available");
+                        else textViewAdd.setText(addr);
+                        new GetPhotoTask().execute();
+                    }else{
+                        attractionChosen = null;
+                        textViewNo.setText("Not available");
+                        textViewAdd.setText("Not available");
+                    }
+                    // release the PlaceBuffer to prevent a memory leak
+                    places.release();
+                }
+            });
 
             return null;
         }
@@ -247,4 +228,86 @@ public class AttractionDescription extends AppCompatActivity implements
         }
 
     }
+    private class GetPhotoTask extends AsyncTask<Void, Void, Void> {
+        ProgressDialog asyncDialog = new ProgressDialog(AttractionDescription.this);
+        String typeStatus;
+
+
+        @Override
+        protected void onPreExecute() {
+            //set message of the dialog
+            asyncDialog.setMessage("Loading");
+            //show dialog
+            asyncDialog.show();
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            Places.GeoDataApi.getPlacePhotos(googleApiClient, place_id).setResultCallback(new ResultCallback<PlacePhotoMetadataResult>() {
+                @Override
+                public void onResult(@NonNull PlacePhotoMetadataResult placePhotoMetadataResult) {
+                    if( placePhotoMetadataResult.getStatus().isSuccess()){
+                        PlacePhotoMetadataBuffer photoMetadataBuffer = placePhotoMetadataResult.getPhotoMetadata();
+                        // Get the first photo in the list.
+                        PlacePhotoMetadata photoMetadata = photoMetadataBuffer.get(0);
+                        new GetBitmapTask().execute(photoMetadata);
+                    }
+                }
+            });
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            //hide the dialog
+            asyncDialog.dismiss();
+
+            super.onPostExecute(result);
+        }
+
+    }
+    private class GetBitmapTask extends AsyncTask<PlacePhotoMetadata, Void, Bitmap> {
+        ProgressDialog asyncDialog = new ProgressDialog(AttractionDescription.this);
+        String typeStatus;
+
+
+        @Override
+        protected void onPreExecute() {
+            //set message of the dialog
+            asyncDialog.setMessage("Loading");
+            //show dialog
+            asyncDialog.show();
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Bitmap doInBackground(PlacePhotoMetadata... arg0) {
+            PlacePhotoMetadata r = arg0[0];
+            r.getPhoto(googleApiClient).setResultCallback(new ResultCallback<PlacePhotoResult>() {
+                @Override
+                public void onResult(@NonNull PlacePhotoResult placePhotoResult) {
+                    if (placePhotoResult.getBitmap() != null) {
+                        Bitmap image = placePhotoResult.getBitmap();
+                        Bitmap resized = Bitmap.createScaledBitmap(image, width, height/3, true);
+                        attractionImage.setImageBitmap(resized);
+                        attractionImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    }
+                }
+            });
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            //hide the dialog
+            asyncDialog.dismiss();
+
+            super.onPostExecute(result);
+        }
+
+    }
+
 }
