@@ -267,7 +267,7 @@ public class AttractionListFragment extends Fragment {
                 }
                 if (spellCheckResult==null){
                     Toast.makeText(getActivity(),"Invalid Input",Toast.LENGTH_SHORT).show();
-                    Log.i("attr","toasty");
+                    //Log.i("attr","toasty");
                 }
                 else{
                     Toast.makeText(getActivity(),"results Input",Toast.LENGTH_SHORT).show();
