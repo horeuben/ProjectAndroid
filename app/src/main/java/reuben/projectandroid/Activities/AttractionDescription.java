@@ -1,6 +1,7 @@
 package reuben.projectandroid.Activities;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,6 +11,7 @@ import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -84,7 +86,7 @@ public class AttractionDescription extends AppCompatActivity implements
 
     private static final String LOG_TAG = "AttractionDescription";
     ImageView attractionImage;
-    TextView textViewAdd, textViewNo,textViewDesc;
+    TextView textViewAdd, textViewNo,textViewDesc, textViewurl;
     private Place attractionChosen;
     private GoogleApiClient googleApiClient;
     private GoogleMap mMap;
@@ -95,7 +97,7 @@ public class AttractionDescription extends AppCompatActivity implements
     private Attraction attraction;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private DatabaseHandler db;
-
+    private Uri uri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,6 +127,7 @@ public class AttractionDescription extends AppCompatActivity implements
         textViewAdd = (TextView) findViewById(R.id.textView_add);
         textViewNo = (TextView) findViewById(R.id.textView_no);
         textViewDesc = (TextView) findViewById(R.id.textView_desc);
+        textViewurl = (TextView) findViewById(R.id.textViewurl);
         fab = (FloatingActionButton) findViewById(R.id.floatingActionButton);
         if (attraction.getInItinerary() ==1)
             fab.setImageBitmap(textAsBitmap("Delete",14, Color.WHITE));
@@ -225,11 +228,12 @@ public class AttractionDescription extends AppCompatActivity implements
             Places.GeoDataApi.getPlaceById(googleApiClient, attraction.getPlaceid()).setResultCallback(new ResultCallback<PlaceBuffer>() {
                 @Override
                 public void onResult(PlaceBuffer places) {
-                    if(places.getStatus().isSuccess()) {
+                    if(places.getStatus().isSuccess() && places.getCount()!=0) {
                         attractionChosen = places.get(0);
                         String no = attractionChosen.getPhoneNumber().toString();
                         String addr = attractionChosen.getAddress().toString();
                         LatLng latLng = attractionChosen.getLatLng();
+                        uri = attractionChosen.getWebsiteUri();
                         mMap.addMarker(new MarkerOptions().position(latLng).title(attractionChosen.getName().toString()));
                         float zoomLevel = 15.0f; //This goes up to 21
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
@@ -237,11 +241,29 @@ public class AttractionDescription extends AppCompatActivity implements
                         else textViewNo.setText(no);
                         if (addr.equals("")) textViewAdd.setText("Not available");
                         else textViewAdd.setText(addr);
+                        if (uri==null) {
+                            textViewurl.setText("Not available");
+                            textViewurl.setTextColor(Color.DKGRAY);
+                        }
+                        else {
+                            textViewurl.setPaintFlags(textViewurl.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                            textViewurl.setText(uri.toString());
+                            textViewurl.setTextColor(Color.BLUE);
+                            textViewurl.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    //implicit intent lel
+                                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                    startActivity(intent);
+                                }
+                            });
+                        }
                         new GetPhotoTask().execute();
                     }else{
                         attractionChosen = null;
                         textViewNo.setText("Not available");
                         textViewAdd.setText("Not available");
+                        textViewurl.setText("Not available");
                     }
                     // release the PlaceBuffer to prevent a memory leak
                     places.release();
