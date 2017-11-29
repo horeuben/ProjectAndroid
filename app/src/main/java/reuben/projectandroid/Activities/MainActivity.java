@@ -18,15 +18,15 @@ import android.widget.TextView;
 
 import reuben.projectandroid.Database.ItineraryItem;
 import reuben.projectandroid.Fragments.AttractionListFragment;
-import reuben.projectandroid.Fragments.ItineraryFragment;
+import reuben.projectandroid.Fragments.ItineraryListFragment;
 import reuben.projectandroid.R;
 
 public class MainActivity extends AppCompatActivity implements
         AttractionListFragment.OnFragmentInteractionListener,
-        ItineraryFragment.OnFragmentInteractionListener{
+        ItineraryListFragment.OnFragmentInteractionListener{
 
     AttractionListFragment attractionListFragment;
-    ItineraryFragment itineraryFragment;
+    ItineraryListFragment itineraryListFragment;
     FragmentTransaction transaction;
     //needed for the autocomplete bar
     private final String KEY="AttractionOnMap";
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 case R.id.navigation_itinerary:
                     setTitle("Itinerary");
-                    transaction.replace(R.id.fragment_container, itineraryFragment);
+                    transaction.replace(R.id.fragment_container, itineraryListFragment);
                     transaction.commit();
                     return true;
             }
@@ -64,13 +64,9 @@ public class MainActivity extends AppCompatActivity implements
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        setTitle("Itinerary");
-        itineraryFragment = new ItineraryFragment();
-        transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, itineraryFragment);
-        transaction.commit();
         setTitle("Attractions");
         attractionListFragment = new AttractionListFragment();
+        itineraryListFragment = new ItineraryListFragment();
         transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, attractionListFragment);
         transaction.commit();

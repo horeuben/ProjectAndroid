@@ -152,6 +152,7 @@ public class AttractionListFragment extends Fragment {
                 attrIntent.putExtra("atrDesc",attractions.get(position).getDescription());
                 attrIntent.putExtra("atrType",attractions.get(position).getType());
                 attrIntent.putExtra("atrPlaceid",attractions.get(position).getPlaceid()); //use this to getplacebyid
+                attrIntent.putExtra("atrInItinerary", attractions.get(position).getInItinerary());
                 startActivity(attrIntent);
             }
 
@@ -173,8 +174,6 @@ public class AttractionListFragment extends Fragment {
         }catch (Exception e){
             e.printStackTrace();
         }
-
-
 
         //attractionList=db.attrNameList();
         //get a list of only attraction names
@@ -202,6 +201,7 @@ public class AttractionListFragment extends Fragment {
                 autoCompIntent.putExtra("atrDesc",attractions.get(placeSelectedIndex).getDescription());
                 autoCompIntent.putExtra("atrType",attractions.get(placeSelectedIndex).getType());
                 autoCompIntent.putExtra("atrPlaceid",attractions.get(placeSelectedIndex).getPlaceid()); //use this to getplacebyid
+                autoCompIntent.putExtra("atrInItinerary", attractions.get(placeSelectedIndex).getInItinerary());
                 startActivity(autoCompIntent);
                 //clears the searchbar
                 searchBar.setText("");
@@ -210,12 +210,7 @@ public class AttractionListFragment extends Fragment {
 
         });
 
-
         return rootView;
-
-
-
-
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -254,6 +249,8 @@ public class AttractionListFragment extends Fragment {
     public void onResume() {
 
         super.onResume();
+        attractions = db.getAttractions();
+        adapter.notifyDataSetChanged();
 
     }
     @Override

@@ -25,6 +25,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
@@ -67,9 +68,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import reuben.projectandroid.Database.Attraction;
+import reuben.projectandroid.Database.DatabaseHandler;
 import reuben.projectandroid.Database.ItineraryDatabaseHandler;
 import reuben.projectandroid.Database.ItineraryItem;
 import reuben.projectandroid.R;
+
+import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 
 
 //TODO: JY place id search reuturning 0 places
@@ -84,20 +88,19 @@ public class AttractionDescription extends AppCompatActivity implements
     private Place attractionChosen;
     private GoogleApiClient googleApiClient;
     private GoogleMap mMap;
-    private LatLng attrChosenCoord;
-    private String place_id;
-    private ToggleButton addAttrToIti;
     private ItineraryDatabaseHandler itineraryDatabaseHandler=new ItineraryDatabaseHandler(AttractionDescription.this);
-    private String AttrName;
     private List<ItineraryItem> itineraryItemList;
     private int height,width;
-    private LinearLayout maplayout;
+    private FloatingActionButton fab;
+    private Attraction attraction;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+    private DatabaseHandler db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attraction_description);
-
+        db = new DatabaseHandler(this);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         height = displayMetrics.heightPixels;
@@ -110,62 +113,74 @@ public class AttractionDescription extends AppCompatActivity implements
                 .addConnectionCallbacks(this)
                 .build();
 
+        //get name, place id and desc from bundle, as well as description
+        Bundle b = getIntent().getExtras();
+        attraction = new Attraction();
+        attraction.setName(b.getString("atrName"));
+        attraction.setPlaceid(b.getString("atrPlaceid"));
+        attraction.setDescription(b.getString("atrDesc"));
+        attraction.setInItinerary(b.getInt("atrInItinerary"));
+
+        attractionImage = (ImageView) findViewById(R.id.attraction_image);
+        textViewAdd = (TextView) findViewById(R.id.textView_add);
+        textViewNo = (TextView) findViewById(R.id.textView_no);
+        textViewDesc = (TextView) findViewById(R.id.textView_desc);
+        fab = (FloatingActionButton) findViewById(R.id.floatingActionButton);
+        if (attraction.getInItinerary() ==1)
+            fab.setImageBitmap(textAsBitmap("Delete",14, Color.WHITE));
+        else
+            fab.setImageBitmap(textAsBitmap("Add",14, Color.WHITE));
+        textViewDesc.setText(attraction.getDescription());
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.attraction_bar);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.attractionOnMap);
         ViewGroup.LayoutParams params = mapFragment.getView().getLayoutParams();
         params.height = height*7/10;
         params.width = width;
         mapFragment.getView().setLayoutParams(params);
+        mapFragment.getView().setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch(event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // PRESSED
+                        CollapsingToolbarLayout.LayoutParams ctlparams = new CollapsingToolbarLayout.LayoutParams(collapsingToolbarLayout.getLayoutParams());
+                        ctlparams.setCollapseMode(CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_OFF);
+                        collapsingToolbarLayout.setLayoutParams(ctlparams);
+                        return true; // if you want to handle the touch event
+                    case MotionEvent.ACTION_UP:
+                        // RELEASED
+                        CollapsingToolbarLayout.LayoutParams ctlparamsa = new CollapsingToolbarLayout.LayoutParams(collapsingToolbarLayout.getLayoutParams());
+                        ctlparamsa.setCollapseMode(CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PARALLAX);
+                        collapsingToolbarLayout.setLayoutParams(ctlparamsa);
+                        return true; // if you want to handle the touch event
+                }
+                return false;
+            }
+        });
+
+        collapsingToolbarLayout.setTitle(attraction.getName());
         mapFragment.getMapAsync(this);
-
-        //get name, place id and desc from bundle, as well as description
-        Bundle b = getIntent().getExtras();
-        AttrName = b.getString("atrName");
-        String desc = b.getString("atrDesc");
-        place_id = b.getString("atrPlaceid");
-       // Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.stockpic1);
-        attractionImage = (ImageView) findViewById(R.id.attraction_image);
-        //using stock pic currently
-        addAttrToIti = (ToggleButton) findViewById(R.id.addAttraction);
-        addAttrToIti.setOnCheckedChangeListener(toggleBttnListener);
-        textViewAdd = (TextView) findViewById(R.id.textView_add);
-        textViewNo = (TextView) findViewById(R.id.textView_no);
-        textViewDesc = (TextView) findViewById(R.id.textView_desc);
-
-        textViewDesc.setText(desc);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.attraction_bar);
-
-        collapsingToolbarLayout.setTitle(AttrName);
         new GetPlaceTask().execute();
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (attraction.getInItinerary()==0){
+                    attraction.setInItinerary(1);
+                    fab.setImageBitmap(textAsBitmap("Delete",14, Color.WHITE));
+                    db.setInItinerary(attraction);
+                }
+                else{
+                    attraction.setInItinerary(0);
+                    fab.setImageBitmap(textAsBitmap("Add",14, Color.WHITE));
+                    db.setInItinerary(attraction);
+                }
+            }
+        });
 
     }
-
-//TODO: the toggle bttn also does nothing
-    private CompoundButton.OnCheckedChangeListener toggleBttnListener
-        =new CompoundButton.OnCheckedChangeListener(){
-
-        @Override
-        public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-            if (isChecked){
-                //add item
-                ItineraryItem iti = new ItineraryItem(AttrName);
-                itineraryDatabaseHandler.createItiItem(iti);
-                Log.i(LOG_TAG, "adding");
-                //its adding but not appearing in itinerary
-            }
-            else{
-                //create new Itinerary item and add it to the list view
-                itineraryDatabaseHandler.deleteItiItem(AttrName);
-                Log.i(LOG_TAG, "deleting");
-                //add item to the database
-
-            }
-            //make all the entries into a list
-            itineraryItemList = itineraryDatabaseHandler.getItiItems();
-
-        }
-    };
 
 
     @Override
@@ -207,7 +222,7 @@ public class AttractionDescription extends AppCompatActivity implements
 //                Toast.makeText(getApplicationContext(),"Still connecting",Toast.LENGTH_SHORT).show();
                 a = googleApiClient.isConnected();
             }
-            Places.GeoDataApi.getPlaceById(googleApiClient, place_id).setResultCallback(new ResultCallback<PlaceBuffer>() {
+            Places.GeoDataApi.getPlaceById(googleApiClient, attraction.getPlaceid()).setResultCallback(new ResultCallback<PlaceBuffer>() {
                 @Override
                 public void onResult(PlaceBuffer places) {
                     if(places.getStatus().isSuccess()) {
@@ -261,7 +276,7 @@ public class AttractionDescription extends AppCompatActivity implements
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            Places.GeoDataApi.getPlacePhotos(googleApiClient, place_id).setResultCallback(new ResultCallback<PlacePhotoMetadataResult>() {
+            Places.GeoDataApi.getPlacePhotos(googleApiClient, attraction.getPlaceid()).setResultCallback(new ResultCallback<PlacePhotoMetadataResult>() {
                 @Override
                 public void onResult(@NonNull PlacePhotoMetadataResult placePhotoMetadataResult) {
                     if( placePhotoMetadataResult.getStatus().isSuccess()){
@@ -339,16 +354,21 @@ public class AttractionDescription extends AppCompatActivity implements
     }
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        //when the map is ready I will display changi Airport
-        //this will quickly be overwritten by the things in AsyncTask where the Marker will change
-        //and zoom of the map will also change
         mMap = googleMap;
-//        LatLng changiAirport = new LatLng(1.3644, 103.9915);
-//        mMap.addMarker(new MarkerOptions().position(changiAirport).title("Changi Airport"));
-//        //mMap.moveCamera(CameraUpdateFactory.newLatLng(changiAirport));
-//        float zoomLevel = 15.0f; //This goes up to 21
-//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(changiAirport, zoomLevel));
-        //nothing happens everything that happens here must wait on place to be successfully called
     }
 
+    public static Bitmap textAsBitmap(String text, float textSize, int textColor) {
+        Paint paint = new Paint(ANTI_ALIAS_FLAG);
+        paint.setTextSize(textSize);
+        paint.setColor(textColor);
+        paint.setTextAlign(Paint.Align.LEFT);
+        float baseline = -paint.ascent(); // ascent() is negative
+        int width = (int) (paint.measureText(text) + 0.0f); // round
+        int height = (int) (baseline + paint.descent() + 0.0f);
+        Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(image);
+        canvas.drawText(text, 0, baseline, paint);
+        return image;
+    }
 }
