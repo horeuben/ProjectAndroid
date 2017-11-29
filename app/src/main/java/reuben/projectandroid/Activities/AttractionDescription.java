@@ -72,7 +72,6 @@ import reuben.projectandroid.Database.ItineraryItem;
 import reuben.projectandroid.R;
 
 
-//TODO: JY place id search reuturning 0 places
 public class AttractionDescription extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -141,7 +140,7 @@ public class AttractionDescription extends AppCompatActivity implements
 
     }
 
-//TODO: the toggle bttn also does nothing
+
     private CompoundButton.OnCheckedChangeListener toggleBttnListener
         =new CompoundButton.OnCheckedChangeListener(){
 

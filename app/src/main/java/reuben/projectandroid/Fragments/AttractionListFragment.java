@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.text.method.TextKeyListener;
 import android.util.Log;
@@ -16,14 +17,21 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Attr;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import reuben.projectandroid.Activities.AttractionDescription;
 import reuben.projectandroid.Adapters.AttractionAdapter;
@@ -54,9 +62,22 @@ public class AttractionListFragment extends Fragment {
     List<Attraction> attractions;
     private OnFragmentInteractionListener mListener;
     public static AttractionAdapter adapter;
+    public static AttractionAdapter searchAdapter;
     private static Parcelable state;
     private DatabaseHandler db;
     private List<String> attractionList;
+    private FloatingActionButton searchButton;
+
+    //these are commonly misspelled words
+    private Map<String, List<String>> searchBase= new HashMap<String, List<String>>();
+    {{  searchBase.put("Sentosa", new ArrayList<>(Arrays.asList("Resorts World Sentosa")));
+        searchBase.put("Buddha",new ArrayList<>(Arrays.asList("Buddha Tooth Relic Temple")));
+        searchBase.put("Animal",new ArrayList<>(Arrays.asList("Animal Concerns Research & Education Society ACRES","Society for the Prevention of Cruelty to Animals SPCA",
+                "Oasis Second Chance Animal Shelter OSCAS","Animal Lovers League ALL","Causes for Animals CAS")));
+        searchBase.put("Singapore",new ArrayList<>(Arrays.asList("Singapore Flyer","Singapore Zoo","Save Our Street Dogs SOSD Singapore","Action for Singapore Dogs ASD",
+                "The House Rabbit Society of Singapore HRSS")));
+        searchBase.put("Marina",new ArrayList<>(Arrays.asList("Marina Bay Sands")));
+    }};
 
     public AttractionListFragment() {
         // Required empty public constructor
@@ -154,38 +175,16 @@ public class AttractionListFragment extends Fragment {
                 attrIntent.putExtra("atrPlaceid",attractions.get(position).getPlaceid()); //use this to getplacebyid
                 startActivity(attrIntent);
             }
-
         });
         searchBar=(AutoCompleteTextView) rootView.findViewById(R.id.autoCompleteTextView);
-        Log.i("AttractionListFrag","here");
-        //get internal JSON storage
-        //TODO: encountering problems its raw
-        try{
-            JSONObject obj= new JSONObject(loadJSONFromRaw());
-            JSONArray m_jArry = obj.getJSONArray("attractions");
-            Log.i("AttractionListFrag",String.valueOf(m_jArry.length()));
-            for (int i=0; i<m_jArry.length();i++){
-                JSONObject jo = m_jArry.getJSONObject(i);
-                String placeName = jo.getString("name");
-                Log.i("AttractionListFrag",placeName);
-                attractionList.add(placeName);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-
-
-        //attractionList=db.attrNameList();
+        attractionList=db.attrNameList();
         //get a list of only attraction names
         searchBarAdapter = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1,attractionList);
-        Log.i("AttractionListFrag","here1");
         searchBar.setAdapter(searchBarAdapter);
         //suggestion will appear after 1 character is entered
         searchBar.setThreshold(1);
 
         searchBar.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String placeSelected = (String) adapterView.getItemAtPosition(i);
@@ -205,12 +204,55 @@ public class AttractionListFragment extends Fragment {
                 startActivity(autoCompIntent);
                 //clears the searchbar
                 searchBar.setText("");
-
             }
-
         });
 
-
+        searchButton = (FloatingActionButton) rootView.findViewById(R.id.floatingSearchButton);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<Attraction> spellCheckResult = new ArrayList<Attraction>(){};
+                String UserInput = searchBar.getText().toString();
+                List<String> allMatches = new ArrayList<String>();
+                for (String possibleMatch: searchBase.keySet()){
+                    if (LevenshteinDistance(UserInput,possibleMatch)<=3){
+                        Log.i("levitian","possiblematchis"+possibleMatch);
+                        allMatches.addAll(searchBase.get(possibleMatch));
+                    }
+                }
+                for (String name:allMatches){
+                    Integer placeSelectedIndex = 0;
+                    for (Attraction a : attractions){
+                        if (a.getName().equals(name)){
+                            placeSelectedIndex=attractions.indexOf(a);
+                            spellCheckResult.add(attractions.get(placeSelectedIndex));
+                        }
+                    }
+                }
+                if (spellCheckResult==null){
+                    Toast.makeText(getActivity(),"Invalid Input",Toast.LENGTH_SHORT).show();
+                    Log.i("attr","toasty");
+                }
+                else{
+                    Toast.makeText(getActivity(),"results Input",Toast.LENGTH_SHORT).show();
+                    searchAdapter=new AttractionAdapter(getActivity(),spellCheckResult);
+                    listView.setAdapter(searchAdapter);
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener()  {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Intent attrIntent = new Intent(getActivity(), AttractionDescription.class);
+                            attrIntent.putExtra("atrName",attractions.get(position).getName());
+                            attrIntent.putExtra("atrDesc",attractions.get(position).getDescription());
+                            attrIntent.putExtra("atrType",attractions.get(position).getType());
+                            attrIntent.putExtra("atrPlaceid",attractions.get(position).getPlaceid()); //use this to getplacebyid
+                            startActivity(attrIntent);
+                        }
+                    });
+                }
+                Log.i("AttrList","recorded input is" +UserInput);
+                //use same adapter and same list
+            }
+        });
         return rootView;
 
 
@@ -272,28 +314,42 @@ public class AttractionListFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 
-    public String loadJSONFromRaw(){
-        String json = null;
-        try{
-            InputStream is= getResources().openRawResource(R.raw.attraction_details);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            Log.i("attractionListFragment","here3");
-            json = new String(buffer, "UTF-8");
-        } catch (Exception ex){
-            ex.printStackTrace();
-            Log.i("attractionListFragment","here4");
-            return null;
-        }
-        Log.i("attractionListFragment","json"+"is"+json);
-        return json;
+    private int LevenshteinDistance(String Userinput, String Answer){
+        Log.i("levetian","user is"+Userinput);
+        Log.i("levetian","comparator is"+Answer);
+        char[] UserinputChar = Userinput.toCharArray();
+        char[] AnswerChar = Answer.toCharArray();
 
+        int[][] LevenshteinMat = new int [UserinputChar.length+1][AnswerChar.length+1];
+        Log.i("levetian","len is"+AnswerChar.length);
+        Log.i("levetian","lev Mat len is"+LevenshteinMat[0].length);
+        for (int i=0; i<=UserinputChar.length;i++){
+            LevenshteinMat[i][0]=i;
+        }
+        for (int j=0; j<=AnswerChar.length;j++){
+            LevenshteinMat[0][j]=j;
+        }
+        int substitutionCost=1;
+        for (int k=1;k<=Answer.length();k++){
+            for (int l=1;l<=Userinput.length();l++){
+                if (UserinputChar[l-1]==AnswerChar[k-1]){
+                    substitutionCost=0;
+                }
+                Log.i("levetian","l is"+Integer.toString(l)+" k is"+Integer.toString(k));
+                LevenshteinMat[l][k] = Collections.min(Arrays.asList(LevenshteinMat[l-1][k]+1,
+                        LevenshteinMat[l][k-1]+1, LevenshteinMat[l-1][k-1]+substitutionCost));
+            }
+        }
+        //Toast.makeText("diff is"+Integer.toString(LevenshteinMat[UserinputChar.length][AnswerChar.length],Toast.LENGTH_SHORT).show();
+        Log.i("levitian","diff is"+Integer.toString(LevenshteinMat[UserinputChar.length][AnswerChar.length]));
+        return LevenshteinMat[UserinputChar.length][AnswerChar.length];
     }
+
+
 }
