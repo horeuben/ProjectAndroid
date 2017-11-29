@@ -4,8 +4,12 @@ import android.app.ProgressDialog;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,12 +26,14 @@ import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -46,7 +52,12 @@ import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.PlacePhotoResult;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.w3c.dom.Attr;
 
@@ -64,13 +75,15 @@ import reuben.projectandroid.R;
 //TODO: JY place id search reuturning 0 places
 public class AttractionDescription extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
-        GoogleApiClient.ConnectionCallbacks {
+        GoogleApiClient.ConnectionCallbacks,
+        OnMapReadyCallback {
 
     private static final String LOG_TAG = "AttractionDescription";
     ImageView attractionImage;
     TextView textViewAdd, textViewNo,textViewDesc;
     private Place attractionChosen;
     private GoogleApiClient googleApiClient;
+    private GoogleMap mMap;
     private LatLng attrChosenCoord;
     private String place_id;
     private ToggleButton addAttrToIti;
@@ -78,6 +91,8 @@ public class AttractionDescription extends AppCompatActivity implements
     private String AttrName;
     private List<ItineraryItem> itineraryItemList;
     private int height,width;
+    private LinearLayout maplayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +109,13 @@ public class AttractionDescription extends AppCompatActivity implements
                 .addOnConnectionFailedListener(this)
                 .addConnectionCallbacks(this)
                 .build();
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.attractionOnMap);
+        ViewGroup.LayoutParams params = mapFragment.getView().getLayoutParams();
+        params.height = height*7/10;
+        params.width = width;
+        mapFragment.getView().setLayoutParams(params);
+        mapFragment.getMapAsync(this);
 
         //get name, place id and desc from bundle, as well as description
         Bundle b = getIntent().getExtras();
@@ -192,6 +214,10 @@ public class AttractionDescription extends AppCompatActivity implements
                         attractionChosen = places.get(0);
                         String no = attractionChosen.getPhoneNumber().toString();
                         String addr = attractionChosen.getAddress().toString();
+                        LatLng latLng = attractionChosen.getLatLng();
+                        mMap.addMarker(new MarkerOptions().position(latLng).title(attractionChosen.getName().toString()));
+                        float zoomLevel = 15.0f; //This goes up to 21
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
                         if (no.equals(""))textViewNo.setText("Not available");
                         else textViewNo.setText(no);
                         if (addr.equals("")) textViewAdd.setText("Not available");
@@ -281,7 +307,7 @@ public class AttractionDescription extends AppCompatActivity implements
                 public void onResult(@NonNull PlacePhotoResult placePhotoResult) {
                     if (placePhotoResult.getBitmap() != null) {
                         Bitmap image = placePhotoResult.getBitmap();
-                        Bitmap resized = Bitmap.createScaledBitmap(image, width, height/3, true);
+                        Bitmap resized = darkenBitMap(Bitmap.createScaledBitmap(image, width, height*3/10, true));
                         attractionImage.setImageBitmap(resized);
                         attractionImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
                     }
@@ -299,6 +325,30 @@ public class AttractionDescription extends AppCompatActivity implements
             super.onPostExecute(result);
         }
 
+    }
+    private Bitmap darkenBitMap(Bitmap bm) {
+
+        Canvas canvas = new Canvas(bm);
+        Paint p = new Paint(Color.RED);
+        //ColorFilter filter = new LightingColorFilter(0xFFFFFFFF , 0x00222222); // lighten
+        ColorFilter filter = new LightingColorFilter(0xFFC0C0C0	, 0x00000000);    // darken
+        p.setColorFilter(filter);
+        canvas.drawBitmap(bm, new Matrix(), p);
+
+        return bm;
+    }
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        //when the map is ready I will display changi Airport
+        //this will quickly be overwritten by the things in AsyncTask where the Marker will change
+        //and zoom of the map will also change
+        mMap = googleMap;
+//        LatLng changiAirport = new LatLng(1.3644, 103.9915);
+//        mMap.addMarker(new MarkerOptions().position(changiAirport).title("Changi Airport"));
+//        //mMap.moveCamera(CameraUpdateFactory.newLatLng(changiAirport));
+//        float zoomLevel = 15.0f; //This goes up to 21
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(changiAirport, zoomLevel));
+        //nothing happens everything that happens here must wait on place to be successfully called
     }
 
 }

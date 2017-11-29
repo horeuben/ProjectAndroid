@@ -237,7 +237,7 @@ public class AttractionListFragment extends Fragment {
     }
     @Override
     public void onPause() {
-        state = listView.onSaveInstanceState();    //saves current gridview scrolled state
+        state = listView.onSaveInstanceState();    //saves current scrolled state
         super.onPause();
 
     }
@@ -245,7 +245,7 @@ public class AttractionListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         if(state!=null){
-            listView.onRestoreInstanceState(state); //restores gridview scrolled state
+            listView.onRestoreInstanceState(state); //restores scrolled stategit
         }
         super.onViewCreated(view, savedInstanceState);
     }

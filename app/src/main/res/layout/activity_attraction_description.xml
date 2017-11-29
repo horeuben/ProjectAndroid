@@ -30,21 +30,48 @@
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-            <ImageView
-                android:id="@+id/attraction_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
-                app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.5" />
+            <LinearLayout
+                android:id="@+id/maplayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <fragment
+                    android:id="@+id/attractionOnMap"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="513dp"
+                    tools:context="reuben.projectandroid.Activities.AttractionDescription" />
+
+                <ImageView
+                    android:id="@+id/attraction_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerCrop"
+                    app:layout_collapseMode="parallax"
+                    app:layout_collapseParallaxMultiplier="0.5" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="88dp"
+                android:background="@drawable/scrim_top"
+                app:layout_collapseMode="pin"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="88dp"
+                android:layout_gravity="bottom"
+                android:layout_alignBottom="@+id/attraction_image"
+                android:background="@drawable/scrim_bottom"/>
 
             <ToggleButton
                 android:id="@+id/addAttraction"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textOn="Delete"
-                android:textOff="Add" />
+                android:textOff="Add"
+                android:textOn="Delete" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
@@ -67,7 +94,7 @@
                 android:layout_marginStart="3dp"
                 android:layout_marginTop="5dp"
                 android:elevation="5dp"
-                app:cardCornerRadius="5dp">
+                app:cardCornerRadius="10dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -100,7 +127,7 @@
                 android:layout_marginStart="3dp"
                 android:layout_marginTop="5dp"
                 android:elevation="5dp"
-                app:cardCornerRadius="5dp">
+                app:cardCornerRadius="10dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -133,7 +160,7 @@
                 android:layout_marginStart="3dp"
                 android:layout_marginTop="5dp"
                 android:elevation="5dp"
-                app:cardCornerRadius="5dp">
+                app:cardCornerRadius="10dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"

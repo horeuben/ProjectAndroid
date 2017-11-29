@@ -45,11 +45,7 @@ public class MainActivity extends AppCompatActivity implements
                     transaction.replace(R.id.fragment_container, attractionListFragment);
                     transaction.commit();
                     return true;
-                //this can be deleted
-                case R.id.navigation_map:
-                    setTitle("Map");
 
-                    return true;
                 case R.id.navigation_itinerary:
                     setTitle("Itinerary");
                     transaction.replace(R.id.fragment_container, itineraryFragment);
