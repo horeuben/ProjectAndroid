@@ -100,18 +100,9 @@ public class AttractionDescription extends AppCompatActivity implements
         AttrName = b.getString("atrName");
         String desc = b.getString("atrDesc");
         place_id = b.getString("atrPlaceid");
-        Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.stockpic1);
-        //Gets Place by placeid but not working-->always returns 0 results
-        //get the place object from the ID
-//        PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
-//                .getPlaceById(googleApiClient, place_id);
-//        //query the place ID and returns a bunch of results
-//        Log.i(LOG_TAG, "here?");
-//        placeResult.setResultCallback(placeResultCallback);
-
+       // Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.stockpic1);
         attractionImage = (ImageView) findViewById(R.id.attraction_image);
         //using stock pic currently
-        attractionImage.setImageBitmap(image);
         addAttrToIti = (ToggleButton) findViewById(R.id.addAttraction);
         addAttrToIti.setOnCheckedChangeListener(toggleBttnListener);
         textViewAdd = (TextView) findViewById(R.id.textView_add);

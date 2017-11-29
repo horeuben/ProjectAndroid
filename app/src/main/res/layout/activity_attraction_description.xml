@@ -37,8 +37,7 @@
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
                 app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.5"
-                app:srcCompat="@drawable/stockpic1" />
+                app:layout_collapseParallaxMultiplier="0.5" />
 
             <ToggleButton
                 android:id="@+id/addAttraction"
