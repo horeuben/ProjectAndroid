@@ -8,6 +8,8 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.method.TextKeyListener;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -164,6 +166,8 @@ public class AttractionListFragment extends Fragment {
         }
         adapter = new AttractionAdapter(getActivity(),attractions);
         listView = (ListView) rootView.findViewById(R.id.attraction_list);
+        //listView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
+        //listView.setStackFromBottom(true);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener()  {
             @Override
@@ -177,6 +181,38 @@ public class AttractionListFragment extends Fragment {
             }
         });
         searchBar=(AutoCompleteTextView) rootView.findViewById(R.id.autoCompleteTextView);
+        attractionList=db.attrNameList();
+        //get a list of only attraction names
+        //searchBarAdapter = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1,attractionList);
+        //searchBar.setAdapter(searchBarAdapter);
+        //suggestion will appear after 1 character is entered
+        //searchBar.setThreshold(1);
+        searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                ArrayList<Attraction> Tempattractions = new ArrayList<Attraction>();
+                for (Attraction a:attractions){
+                    if (a.getName().toLowerCase().contains(charSequence.toString().toLowerCase())){
+                        Tempattractions.add(a);
+                    }
+                }
+                AttractionAdapter autoCompAdapter = new AttractionAdapter(getActivity(),Tempattractions);
+                autoCompAdapter.notifyDataSetChanged();
+                listView.setAdapter(autoCompAdapter);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        /*
         attractionList=db.attrNameList();
         //get a list of only attraction names
         searchBarAdapter = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1,attractionList);
@@ -206,7 +242,7 @@ public class AttractionListFragment extends Fragment {
                 searchBar.setText("");
             }
         });
-
+*/
         searchButton = (FloatingActionButton) rootView.findViewById(R.id.floatingSearchButton);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
