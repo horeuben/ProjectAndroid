@@ -3,7 +3,6 @@ package reuben.projectandroid.Itinerary;
 import java.util.ArrayList;
 import java.util.Collections;
 
-
 public class Travel {
 
     private ArrayList<Attraction> travel = new ArrayList<>();
@@ -13,22 +12,6 @@ public class Travel {
         for (int i = 0; i < numberOfCities; i++) {
             travel.add(new Attraction(i));
         }
-    }
-
-    public ArrayList<Attraction> getTravel() {
-        return travel;
-    }
-
-    public void setTravel(ArrayList<Attraction> travel) {
-        this.travel = travel;
-    }
-
-    public ArrayList<Attraction> getPreviousTravel() {
-        return previousTravel;
-    }
-
-    public void setPreviousTravel(ArrayList<Attraction> previousTravel) {
-        this.previousTravel = previousTravel;
     }
 
     public Travel(ArrayList<Attraction> listOfCities) {
@@ -94,4 +77,7 @@ public class Travel {
         return price;
     }
 
+    public ArrayList<Attraction> getTravel() {
+        return travel;
+    }
 }

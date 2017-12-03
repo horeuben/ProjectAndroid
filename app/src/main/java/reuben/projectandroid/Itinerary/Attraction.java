@@ -1,6 +1,5 @@
 package reuben.projectandroid.Itinerary;
 
-
 public class Attraction {
 
     private int x;
@@ -13,54 +12,6 @@ public class Attraction {
             {18, 23, 19, 28,  0, 83},
             {86, 87, 86, 96, 84,  0}
     };
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public static int[][] getPublicMat() {
-        return publicMat;
-    }
-
-    public static void setPublicMat(int[][] publicMat) {
-        Attraction.publicMat = publicMat;
-    }
-
-    public static double[][] getPublicPriceMat() {
-        return publicPriceMat;
-    }
-
-    public static void setPublicPriceMat(double[][] publicPriceMat) {
-        Attraction.publicPriceMat = publicPriceMat;
-    }
-
-    public static int[][] getTaxiMat() {
-        return taxiMat;
-    }
-
-    public static void setTaxiMat(int[][] taxiMat) {
-        Attraction.taxiMat = taxiMat;
-    }
-
-    public static double[][] getTaxiPriceMat() {
-        return taxiPriceMat;
-    }
-
-    public static void setTaxiPriceMat(double[][] taxiPriceMat) {
-        Attraction.taxiPriceMat = taxiPriceMat;
-    }
-
-    public static int[][] getWalkMat() {
-        return walkMat;
-    }
-
-    public static void setWalkMat(int[][] walkMat) {
-        Attraction.walkMat = walkMat;
-    }
 
     private static double[][] publicPriceMat = new double[][]{
             {0.00, 0.83, 1.18, 4.03, 0.88, 1.96},
@@ -124,15 +75,19 @@ public class Attraction {
             return 0.00;
     }
 
-//    public static void main(String[] args) {
-//        int total = 0;
-//        total += publicPriceMat[0][1];
-//        total += publicPriceMat[1][5];
-//        total += publicPriceMat[5][2];
-//        total += publicPriceMat[2][3];
-//        total += publicPriceMat[3][4];
-//        total += publicPriceMat[4][0];
-//        System.out.println(total);
-//    }
+    public int getX() {
+        return x;
+    }
+
+    public static void main(String[] args) {
+        int total = 0;
+        total += publicPriceMat[0][1];
+        total += publicPriceMat[1][5];
+        total += publicPriceMat[5][2];
+        total += publicPriceMat[2][3];
+        total += publicPriceMat[3][4];
+        total += publicPriceMat[4][0];
+        System.out.println(total);
+    }
 
 }
