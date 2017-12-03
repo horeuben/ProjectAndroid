@@ -17,37 +17,23 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ToggleButton;
 
+import android.widget.ImageView;
+
+import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
+
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.GeoDataApi;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.PlacePhotoMetadata;
@@ -62,12 +48,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.w3c.dom.Attr;
-
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import reuben.projectandroid.Database.Attraction;
 import reuben.projectandroid.Database.DatabaseHandler;
@@ -133,7 +114,6 @@ public class AttractionDescription extends AppCompatActivity implements
         textViewDesc.setText(attraction.getDescription());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.attraction_bar);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.attractionOnMap);
         ViewGroup.LayoutParams params = mapFragment.getView().getLayoutParams();
@@ -143,7 +123,7 @@ public class AttractionDescription extends AppCompatActivity implements
         mapFragment.getView().setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
+                switch(event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         // PRESSED
                         CollapsingToolbarLayout.LayoutParams ctlparams = new CollapsingToolbarLayout.LayoutParams(collapsingToolbarLayout.getLayoutParams());
@@ -160,12 +140,29 @@ public class AttractionDescription extends AppCompatActivity implements
                 return false;
             }
         });
-        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.attraction_bar);
 
         collapsingToolbarLayout.setTitle(attraction.getName());
+        mapFragment.getMapAsync(this);
         new GetPlaceTask().execute();
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (attraction.getInItinerary()==0){
+                    attraction.setInItinerary(1);
+                    fab.setImageBitmap(textAsBitmap("Delete",14, Color.WHITE));
+                    db.setInItinerary(attraction);
+                }
+                else{
+                    attraction.setInItinerary(0);
+                    fab.setImageBitmap(textAsBitmap("Add",14, Color.WHITE));
+                    db.setInItinerary(attraction);
+                }
+            }
+        });
 
     }
+
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -184,8 +181,6 @@ public class AttractionDescription extends AppCompatActivity implements
     }
     private class GetPlaceTask extends AsyncTask<Void, Void, Void> {
         ProgressDialog asyncDialog = new ProgressDialog(AttractionDescription.this);
-        String typeStatus;
-
 
         @Override
         protected void onPreExecute() {
@@ -216,12 +211,12 @@ public class AttractionDescription extends AppCompatActivity implements
                         mMap.addMarker(new MarkerOptions().position(latLng).title(attractionChosen.getName().toString()));
                         float zoomLevel = 15.0f; //This goes up to 21
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
-                        if (no.equals(""))textViewNo.setText("Not available");
+                        if (no.equals(""))textViewNo.setText(R.string.natext);
                         else textViewNo.setText(no);
-                        if (addr.equals("")) textViewAdd.setText("Not available");
+                        if (addr.equals("")) textViewAdd.setText(R.string.natext);
                         else textViewAdd.setText(addr);
                         if (uri==null) {
-                            textViewurl.setText("Not available");
+                            textViewurl.setText(R.string.natext);
                             textViewurl.setTextColor(Color.DKGRAY);
                         }
                         else {
@@ -240,9 +235,9 @@ public class AttractionDescription extends AppCompatActivity implements
                         new GetPhotoTask().execute();
                     }else{
                         attractionChosen = null;
-                        textViewNo.setText("Not available");
-                        textViewAdd.setText("Not available");
-                        textViewurl.setText("Not available");
+                        textViewNo.setText(R.string.natext);
+                        textViewAdd.setText(R.string.natext);
+                        textViewurl.setText(R.string.natext);
                     }
                     // release the PlaceBuffer to prevent a memory leak
                     places.release();
@@ -263,8 +258,6 @@ public class AttractionDescription extends AppCompatActivity implements
     }
     private class GetPhotoTask extends AsyncTask<Void, Void, Void> {
         ProgressDialog asyncDialog = new ProgressDialog(AttractionDescription.this);
-        String typeStatus;
-
 
         @Override
         protected void onPreExecute() {
@@ -303,8 +296,6 @@ public class AttractionDescription extends AppCompatActivity implements
     }
     private class GetBitmapTask extends AsyncTask<PlacePhotoMetadata, Void, Bitmap> {
         ProgressDialog asyncDialog = new ProgressDialog(AttractionDescription.this);
-        String typeStatus;
-
 
         @Override
         protected void onPreExecute() {
