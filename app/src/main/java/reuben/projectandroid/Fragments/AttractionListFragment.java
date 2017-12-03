@@ -67,7 +67,9 @@ public class AttractionListFragment extends Fragment {
     private List<String> attractionList;
     private SearchView searchVFn;
 
-    //these are commonly misspelled words
+    //these are commonly misspelled words that we will use to predict the word user is trying to type
+    //list of commonly misspelled words consist of local names, since local place names are not on autocorrect, and people are unfamiliar with it, (it doensnt follow normal han yu pin yin spelling)
+    //tourists would most likely spell local place names wrongly
     private Map<String, List<String>> searchBase= new HashMap<String, List<String>>();
     {{  searchBase.put("Sentosa", new ArrayList<>(Arrays.asList("Resorts World Sentosa")));
         searchBase.put("Buddha",new ArrayList<>(Arrays.asList("Buddha Tooth Relic Temple")));
@@ -77,6 +79,7 @@ public class AttractionListFragment extends Fragment {
         searchBase.put("Kranji",new ArrayList<>(Arrays.asList("Kranji War Memorial")));
         searchBase.put("Haw Par",new ArrayList<>(Arrays.asList("Haw Par Villa")));
         searchBase.put("Ericsson",new ArrayList<>(Arrays.asList("Ericsson Pet Farm")));
+        searchBase.put("Jurong",new ArrayList<>(Arrays.asList("Jurong Frog Farm","Jurong Bird Park")));
     }};
 
     public AttractionListFragment() {
@@ -273,28 +276,28 @@ public class AttractionListFragment extends Fragment {
         searchVFn.setIconified(false); //focus on searchview automatically
         searchVFn.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextChange(String s) {
+            public boolean onQueryTextChange(String s) {   //whenever user types or changes text on searchview the list view changes
                 ArrayList<Attraction> Tempattractions = new ArrayList<>();
                 for (Attraction a : attractions) {
-                    if (a.getName().toLowerCase().contains(s.toLowerCase())) {
+                    if (a.getName().toLowerCase().contains(s.toLowerCase())) { //the attraction list will change dynamically to reflect attractions that only contain string entered by user
                         Tempattractions.add(a);
                     }
                 }
 
                 AttractionAdapter autoCompAdapter = new AttractionAdapter(getActivity(), Tempattractions);
-                autoCompAdapter.notifyDataSetChanged();
+                autoCompAdapter.notifyDataSetChanged(); //set the attraction to the lsit view so list view changes dynamically
                 listView.setAdapter(autoCompAdapter);
                 return true;
             }
 
             @Override
-            public boolean onQueryTextSubmit(String s) {
+            public boolean onQueryTextSubmit(String s) { //once the user hits submit (would only happend if they spell wrongly, and there are 0 suggestions)
                 List<Attraction> spellCheckResult = new ArrayList<Attraction>() {
                 };
                 String UserInput = s;
                 List<String> allMatches = new ArrayList<String>();
-                for (String possibleMatch : searchBase.keySet()) {
-                    // in this weighted average score we will give LCS 60% and leven distance 40% weightage
+                for (String possibleMatch : searchBase.keySet()) { //we start matching their input text to list of commonly mispelled words above
+                    // in this weighted average score we will give LCS 70% and leven distance 30% weightage
                     //normalised score is from -1 to 1 (it will go to negative if leven distance > predicted word)
                     double levenDist = (double) LevenshteinDistance(UserInput, possibleMatch);
                     double longestSubseq = (double) LongestLCS(UserInput, possibleMatch);
@@ -318,9 +321,9 @@ public class AttractionListFragment extends Fragment {
                     }
                 }
                 if (spellCheckResult.size() == 0) {
+                    //prediction returns 0
                     Toast.makeText(getActivity(), "No results found", Toast.LENGTH_SHORT).show();
                 } else {
-                    //Toast.makeText(getActivity(),"results Input",Toast.LENGTH_SHORT).show();
                     searchAdapter = new AttractionAdapter(getActivity(), spellCheckResult);
                     listView.setAdapter(searchAdapter);
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -335,9 +338,7 @@ public class AttractionListFragment extends Fragment {
                         }
                     });
                 }
-                //Log.i("AttrList", "recorded input is" + UserInput);
                 return true;
-                //use same adapter and same list
             }
 
         });
@@ -410,6 +411,8 @@ public class AttractionListFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+    //Levenshtien distance calculates the minimum number of insertions, deletions and substitutions to get from one word to the next
+    //we will use it to predict what local names the user is trying to spell in the search view
     private int LevenshteinDistance(String Userinput, String Answer){
         char[] UserinputChar = Userinput.toCharArray();
         char[] AnswerChar = Answer.toCharArray();
@@ -430,16 +433,15 @@ public class AttractionListFragment extends Fragment {
                 else{
                     substitutionCost=1;
                 }
-                //Log.i("levetian","l is"+Integer.toString(l)+" k is"+Integer.toString(k));
                 LevenshteinMat[l][k] = Collections.min(Arrays.asList(LevenshteinMat[l-1][k]+1,
                         LevenshteinMat[l][k-1]+1, LevenshteinMat[l-1][k-1]+substitutionCost));
             }
         }
-        //Toast.makeText("diff is"+Integer.toString(LevenshteinMat[UserinputChar.length][AnswerChar.length],Toast.LENGTH_SHORT).show();
-        //Log.i("levitian","diff is"+Integer.toString(LevenshteinMat[UserinputChar.length][AnswerChar.length]));
         return LevenshteinMat[UserinputChar.length][AnswerChar.length];
     }
 
+    //longest common subsequence. subsequence need not be consecutive so it works great for predicting text especially since users may insert or delete certain letters
+    //from the place name they intend to spell
     private int LongestLCS(String Userinput, String Answer){
         //ignore capitalization
         char[] UserinputChar = Userinput.toLowerCase().toCharArray();
