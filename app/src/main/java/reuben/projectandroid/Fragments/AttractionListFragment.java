@@ -216,8 +216,16 @@ public class AttractionListFragment extends Fragment {
                 String UserInput = searchBar.getText().toString();
                 List<String> allMatches = new ArrayList<String>();
                 for (String possibleMatch: searchBase.keySet()){
-                    if (LevenshteinDistance(UserInput,possibleMatch)<=3){
-                        Log.i("levitian","possiblematchis"+possibleMatch);
+                    // in this weighted average score we will give LCS 60% and leven distance 40% weightage
+                    //normalised score is from -1 to 1 (it will go to negative if leven distance > predicted word)
+                    double levenDist = (double) LevenshteinDistance(UserInput,possibleMatch);
+                    double longestSubseq = (double) LongestLCS(UserInput,possibleMatch);
+                    //first part of normalised score measures how much of the possible match answer is actually levenshtein distance. this is weighted 40%
+                    //EG. if we compare sentozzza and marina levenshtien dist is 8. len("marina")=6 so first part of normalised score is -0.1333
+                    //second part of the normalized score calculate what prportion of the possible match is part of the LCS this is weigted with 60%
+                    Double normalizedScore = (((possibleMatch.length()-levenDist)/possibleMatch.length())*0.4) + (longestSubseq/possibleMatch.length()*0.6);
+                    //if normalized score is >50% that's a match!
+                    if (normalizedScore>=0.5){
                         allMatches.addAll(searchBase.get(possibleMatch));
                     }
                 }
@@ -230,11 +238,11 @@ public class AttractionListFragment extends Fragment {
                         }
                     }
                 }
-                if (spellCheckResult==null){
-                    Toast.makeText(getActivity(),"Invalid Input",Toast.LENGTH_SHORT).show();
+                if (spellCheckResult.size()==0){
+                    Toast.makeText(getActivity(),"No results found",Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Toast.makeText(getActivity(),"results Input",Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(),"results Input",Toast.LENGTH_SHORT).show();
                     searchAdapter=new AttractionAdapter(getActivity(),spellCheckResult);
                     listView.setAdapter(searchAdapter);
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()  {
@@ -320,34 +328,59 @@ public class AttractionListFragment extends Fragment {
     }
 
     private int LevenshteinDistance(String Userinput, String Answer){
-        Log.i("levetian","user is"+Userinput);
-        Log.i("levetian","comparator is"+Answer);
         char[] UserinputChar = Userinput.toCharArray();
         char[] AnswerChar = Answer.toCharArray();
 
         int[][] LevenshteinMat = new int [UserinputChar.length+1][AnswerChar.length+1];
-        Log.i("levetian","len is"+AnswerChar.length);
-        Log.i("levetian","lev Mat len is"+LevenshteinMat[0].length);
         for (int i=0; i<=UserinputChar.length;i++){
             LevenshteinMat[i][0]=i;
         }
         for (int j=0; j<=AnswerChar.length;j++){
             LevenshteinMat[0][j]=j;
         }
-        int substitutionCost=1;
-        for (int k=1;k<=Answer.length();k++){
-            for (int l=1;l<=Userinput.length();l++){
+        int substitutionCost;
+        for (int l=1;l<=Userinput.length();l++){
+            for (int k=1;k<=Answer.length();k++){
                 if (UserinputChar[l-1]==AnswerChar[k-1]){
                     substitutionCost=0;
                 }
-                Log.i("levetian","l is"+Integer.toString(l)+" k is"+Integer.toString(k));
+                else{
+                    substitutionCost=1;
+                }
+                //Log.i("levetian","l is"+Integer.toString(l)+" k is"+Integer.toString(k));
                 LevenshteinMat[l][k] = Collections.min(Arrays.asList(LevenshteinMat[l-1][k]+1,
                         LevenshteinMat[l][k-1]+1, LevenshteinMat[l-1][k-1]+substitutionCost));
             }
         }
         //Toast.makeText("diff is"+Integer.toString(LevenshteinMat[UserinputChar.length][AnswerChar.length],Toast.LENGTH_SHORT).show();
-        Log.i("levitian","diff is"+Integer.toString(LevenshteinMat[UserinputChar.length][AnswerChar.length]));
+        //Log.i("levitian","diff is"+Integer.toString(LevenshteinMat[UserinputChar.length][AnswerChar.length]));
         return LevenshteinMat[UserinputChar.length][AnswerChar.length];
+    }
+
+    private int LongestLCS(String Userinput, String Answer){
+        //ignore capitalization
+        char[] UserinputChar = Userinput.toLowerCase().toCharArray();
+        char[] AnswerChar = Answer.toLowerCase().toCharArray();
+
+        int[][] LCSMat = new int [UserinputChar.length+1][AnswerChar.length+1];
+        for (int i=0; i<=UserinputChar.length;i++){
+            LCSMat[i][0]=0;
+        }
+        for (int j=0; j<=AnswerChar.length;j++){
+            LCSMat[0][j]=0;
+        }
+        for (int l=1;l<=Userinput.length();l++){
+            for (int k=1;k<=Answer.length();k++) {
+                if (UserinputChar[l-1]==AnswerChar[k-1]){
+                    LCSMat[l][k]=LCSMat[l-1][k-1]+1;
+                }
+                else{
+                    LCSMat[l][k]=Collections.max(Arrays.asList(LCSMat[l][k-1],LCSMat[l-1][k]));
+                }
+            }
+        }
+        Log.i("LCS",Userinput+"//"+Answer+"is"+Integer.toString(LCSMat[UserinputChar.length][AnswerChar.length]));
+        return LCSMat[UserinputChar.length][AnswerChar.length];
     }
 
 
