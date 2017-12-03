@@ -20,7 +20,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private Context context;
     // All Static variables
     // Database Version
-    private static final int DATABASE_VERSION = 17;
+    private static final int DATABASE_VERSION = 1;
     // Database Name
     private static final String DATABASE_NAME = "projectandroid_database";
 

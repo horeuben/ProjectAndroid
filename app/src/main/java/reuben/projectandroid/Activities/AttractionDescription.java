@@ -78,7 +78,6 @@ import reuben.projectandroid.R;
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 
 
-//TODO: JY place id search reuturning 0 places
 public class AttractionDescription extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -90,8 +89,6 @@ public class AttractionDescription extends AppCompatActivity implements
     private Place attractionChosen;
     private GoogleApiClient googleApiClient;
     private GoogleMap mMap;
-    private ItineraryDatabaseHandler itineraryDatabaseHandler=new ItineraryDatabaseHandler(AttractionDescription.this);
-    private List<ItineraryItem> itineraryItemList;
     private int height,width;
     private FloatingActionButton fab;
     private Attraction attraction;
@@ -136,6 +133,7 @@ public class AttractionDescription extends AppCompatActivity implements
         textViewDesc.setText(attraction.getDescription());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.attraction_bar);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.attractionOnMap);
         ViewGroup.LayoutParams params = mapFragment.getView().getLayoutParams();
@@ -145,7 +143,7 @@ public class AttractionDescription extends AppCompatActivity implements
         mapFragment.getView().setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                switch(event.getAction()) {
+                switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         // PRESSED
                         CollapsingToolbarLayout.LayoutParams ctlparams = new CollapsingToolbarLayout.LayoutParams(collapsingToolbarLayout.getLayoutParams());
@@ -162,29 +160,12 @@ public class AttractionDescription extends AppCompatActivity implements
                 return false;
             }
         });
+        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.attraction_bar);
 
         collapsingToolbarLayout.setTitle(attraction.getName());
-        mapFragment.getMapAsync(this);
         new GetPlaceTask().execute();
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (attraction.getInItinerary()==0){
-                    attraction.setInItinerary(1);
-                    fab.setImageBitmap(textAsBitmap("Delete",14, Color.WHITE));
-                    db.setInItinerary(attraction);
-                }
-                else{
-                    attraction.setInItinerary(0);
-                    fab.setImageBitmap(textAsBitmap("Add",14, Color.WHITE));
-                    db.setInItinerary(attraction);
-                }
-            }
-        });
 
     }
-
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -195,8 +176,6 @@ public class AttractionDescription extends AppCompatActivity implements
         Log.e(LOG_TAG, "Google Places API connection failed with error code: "
                 + connectionResult.getErrorCode());
     }
-
-
 
     @Override
     public void onConnectionSuspended(int i) {
