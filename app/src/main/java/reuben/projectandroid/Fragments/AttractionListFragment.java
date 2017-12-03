@@ -212,37 +212,7 @@ public class AttractionListFragment extends Fragment {
             }
         });
 
-        /*
-        attractionList=db.attrNameList();
-        //get a list of only attraction names
-        searchBarAdapter = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1,attractionList);
-        searchBar.setAdapter(searchBarAdapter);
-        //suggestion will appear after 1 character is entered
-        searchBar.setThreshold(1);
 
-        searchBar.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String placeSelected = (String) adapterView.getItemAtPosition(i);
-                //find index of the attraction selected
-                Integer placeSelectedIndex = 0;
-                for (Attraction a : attractions){
-                    if (a.getName().equals(placeSelected)){
-                        placeSelectedIndex=attractions.indexOf(a);
-                    }
-                }
-                //sets up intent
-                Intent autoCompIntent = new Intent(getActivity(),AttractionDescription.class);
-                autoCompIntent.putExtra("atrName",placeSelected);
-                autoCompIntent.putExtra("atrDesc",attractions.get(placeSelectedIndex).getDescription());
-                autoCompIntent.putExtra("atrType",attractions.get(placeSelectedIndex).getType());
-                autoCompIntent.putExtra("atrPlaceid",attractions.get(placeSelectedIndex).getPlaceid()); //use this to getplacebyid
-                startActivity(autoCompIntent);
-                //clears the searchbar
-                searchBar.setText("");
-            }
-        });
-*/
         searchButton = (FloatingActionButton) rootView.findViewById(R.id.floatingSearchButton);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
