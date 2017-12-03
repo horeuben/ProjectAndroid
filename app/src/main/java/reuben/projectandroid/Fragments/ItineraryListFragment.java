@@ -99,6 +99,7 @@ public class ItineraryListFragment extends Fragment {
                 attrIntent.putExtra("atrType",attractions.get(position).getType());
                 attrIntent.putExtra("atrPlaceid",attractions.get(position).getPlaceid()); //use this to getplacebyid
                 attrIntent.putExtra("atrInItinerary", attractions.get(position).getInItinerary());
+                attrIntent.putExtra("atrId", attractions.get(position).getId());
                 startActivity(attrIntent);
             }
 
@@ -168,23 +169,4 @@ public class ItineraryListFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    public String loadJSONFromRaw(){
-        String json = null;
-        try{
-            InputStream is= getResources().openRawResource(R.raw.attraction_details);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            Log.i("attractionListFragment","here3");
-            json = new String(buffer, "UTF-8");
-        } catch (Exception ex){
-            ex.printStackTrace();
-            Log.i("attractionListFragment","here4");
-            return null;
-        }
-        Log.i("attractionListFragment","json"+"is"+json);
-        return json;
-
-    }
 }

@@ -1,22 +1,13 @@
 package reuben.projectandroid.Activities;
 
-import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.FragmentTabHost;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.TextView;
 
-import reuben.projectandroid.Database.ItineraryItem;
 import reuben.projectandroid.Fragments.AttractionListFragment;
 import reuben.projectandroid.Fragments.ItineraryListFragment;
 import reuben.projectandroid.R;

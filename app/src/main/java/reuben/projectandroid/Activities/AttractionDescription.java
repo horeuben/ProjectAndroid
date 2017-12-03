@@ -2,9 +2,7 @@ package reuben.projectandroid.Activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -13,7 +11,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -48,12 +45,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.List;
+import java.util.Random;
 
 import reuben.projectandroid.Database.Attraction;
 import reuben.projectandroid.Database.DatabaseHandler;
-import reuben.projectandroid.Database.ItineraryDatabaseHandler;
-import reuben.projectandroid.Database.ItineraryItem;
 import reuben.projectandroid.R;
 
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
@@ -100,7 +95,7 @@ public class AttractionDescription extends AppCompatActivity implements
         attraction.setPlaceid(b.getString("atrPlaceid"));
         attraction.setDescription(b.getString("atrDesc"));
         attraction.setInItinerary(b.getInt("atrInItinerary"));
-
+        attraction.setId(b.getInt("atrId"));
         attractionImage = (ImageView) findViewById(R.id.attraction_image);
         textViewAdd = (TextView) findViewById(R.id.textView_add);
         textViewNo = (TextView) findViewById(R.id.textView_no);
@@ -277,6 +272,12 @@ public class AttractionDescription extends AppCompatActivity implements
                         PlacePhotoMetadataBuffer photoMetadataBuffer = placePhotoMetadataResult.getPhotoMetadata();
                         // Get the first photo in the list.
                         PlacePhotoMetadata photoMetadata = photoMetadataBuffer.get(0);
+                        // just choosing images between top 3, randomly select one of them to display
+                        if (photoMetadataBuffer.getCount()>3){
+                            Random r = new Random();
+                            photoMetadata = photoMetadataBuffer.get(r.nextInt(3));
+                        }
+
                         new GetBitmapTask().execute(photoMetadata);
                     }
                 }

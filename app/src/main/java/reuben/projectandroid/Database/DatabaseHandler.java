@@ -20,7 +20,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private Context context;
     // All Static variables
     // Database Version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     // Database Name
     private static final String DATABASE_NAME = "projectandroid_database";
 
@@ -33,6 +33,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_DESC = "desc";
     private static final String KEY_TYPE = "type";
     private static final String KEY_IN_ITINERARY = "in_itinerary";
+    private static final String KEY_ID = "id";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -41,7 +42,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_ATTRACTION_TABLE = "CREATE TABLE " + TABLE_ATTRACTIONS + "("+ KEY_PLACE_ID + " TEXT PRIMARY KEY ," + KEY_NAME + " TEXT,"+ KEY_TYPE + " TEXT,"+ KEY_DESC + " TEXT, "+ KEY_IN_ITINERARY + " INTEGER DEFAULT 0" + ")";
+        String CREATE_ATTRACTION_TABLE = "CREATE TABLE " + TABLE_ATTRACTIONS + "("+ KEY_PLACE_ID + " TEXT PRIMARY KEY ," + KEY_NAME + " TEXT,"+ KEY_TYPE + " TEXT,"+ KEY_DESC + " TEXT, "+ KEY_IN_ITINERARY + " INTEGER DEFAULT 0," + KEY_ID + " INTEGER DEFAULT 0" + ")";
         db.execSQL(CREATE_ATTRACTION_TABLE);
     }
 
@@ -64,6 +65,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_PLACE_ID, attraction.getPlaceid());
         values.put(KEY_TYPE, attraction.getType().name());
         values.put(KEY_IN_ITINERARY, attraction.getInItinerary());
+        values.put(KEY_ID, attraction.getId());
         // insert row
         db.insert(TABLE_ATTRACTIONS, null, values);
         db.close();
@@ -87,6 +89,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 attraction.setDescription(c.getString(c.getColumnIndex(KEY_DESC)));
                 attraction.setType(Attraction.AttractionType.valueOf(c.getString(c.getColumnIndex(KEY_TYPE))));
                 attraction.setInItinerary(c.getInt(c.getColumnIndex(KEY_IN_ITINERARY)));
+                attraction.setId(c.getInt(c.getColumnIndex(KEY_ID)));
                 attractions.add(attraction);
 
             } while (c.moveToNext());
@@ -124,6 +127,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 attraction.setDescription(c.getString(c.getColumnIndex(KEY_DESC)));
                 attraction.setType(Attraction.AttractionType.valueOf(c.getString(c.getColumnIndex(KEY_TYPE))));
                 attraction.setInItinerary(c.getInt(c.getColumnIndex(KEY_IN_ITINERARY)));
+                attraction.setInItinerary(c.getInt(c.getColumnIndex(KEY_ID)));
                 attractions.add(attraction);
 
             } while (c.moveToNext());
@@ -133,25 +137,4 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return attractions;
     }
 
-    public List<String> attrNameList(){
-        List<String> attractionNamesList = new ArrayList<>();
-
-        String selectQuery = "SELECT "+KEY_NAME+" FROM "+TABLE_ATTRACTIONS;
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.rawQuery(selectQuery, null);
-        String placeName="";
-        Log.i("DatabseHandler","here123");
-
-        if (c.moveToFirst()) {
-            do {
-                placeName=c.getString(c.getColumnIndex(KEY_NAME));
-                attractionNamesList.add(placeName);
-
-            } while (c.moveToNext());
-        }
-        c.close();
-        db.close();
-        return attractionNamesList;
-
-    }
 }

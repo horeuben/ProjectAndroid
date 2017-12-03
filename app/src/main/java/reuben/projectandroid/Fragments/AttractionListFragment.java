@@ -116,56 +116,54 @@ public class AttractionListFragment extends Fragment {
         attractions = db.getAttractions();
         if(attractions.size()==0){
             Attraction a = new Attraction();
-            a.setName("Marina Bay Sands"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_mbs)); a.setPlaceid("ChIJm3G3-AYZ2jERfByv0oRiOwA"); a.setType(Attraction.AttractionType.HOTEL);
+            a.setName("Marina Bay Sands"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_mbs)); a.setPlaceid("ChIJm3G3-AYZ2jERfByv0oRiOwA"); a.setType(Attraction.AttractionType.HOTEL); a.setId(0);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Singapore Flyer"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_sflyer)); a.setPlaceid("ChIJ_WTZdKoZ2jERK024PgmtUrs"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("Singapore Flyer"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_sflyer)); a.setPlaceid("ChIJ_WTZdKoZ2jERK024PgmtUrs"); a.setType(Attraction.AttractionType.LOCAL_SEE); a.setId(1);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Vivo City"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_vivo)); a.setPlaceid("ChIJK7xLl1gZ2jERP_GdUY9XNLo"); a.setType(Attraction.AttractionType.LOCAL_MALL);
+            a.setName("Vivo City"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_vivo)); a.setPlaceid("ChIJK7xLl1gZ2jERP_GdUY9XNLo"); a.setType(Attraction.AttractionType.LOCAL_MALL); a.setId(1);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Resorts World Sentosa"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_rws)); a.setPlaceid("ChIJLR75v_0b2jERJrR28stYwMU"); a.setType(Attraction.AttractionType.HOTEL);
+            a.setName("Resorts World Sentosa"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_rws)); a.setPlaceid("ChIJLR75v_0b2jERJrR28stYwMU"); a.setType(Attraction.AttractionType.HOTEL); a.setId(3);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Buddha Tooth Relic Temple"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_btrt)); a.setPlaceid("ChIJ0bwmznIZ2jEREOCMNggtIBk"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("Buddha Tooth Relic Temple"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_btrt)); a.setPlaceid("ChIJ0bwmznIZ2jEREOCMNggtIBk"); a.setType(Attraction.AttractionType.LOCAL_SEE); a.setId(4);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Singapore Zoo"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_zoo)); a.setPlaceid("ChIJr9wqENkT2jERkRs7pMj6FLQ"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("Singapore Zoo"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_zoo)); a.setPlaceid("ChIJr9wqENkT2jERkRs7pMj6FLQ"); a.setType(Attraction.AttractionType.LOCAL_SEE); a.setId(5);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("The Cat Cafe"); a.setDescription("Meow meow"); a.setPlaceid("id1"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("The Cat Cafe"); a.setDescription("Meow meow"); a.setPlaceid("id1"); a.setType(Attraction.AttractionType.LOCAL_SEE); a.setId(6);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Animal Concerns Research & Education Society ACRES"); a.setDescription("placeholder1"); a.setPlaceid("id2"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("Animal Concerns Research & Education Society ACRES"); a.setDescription("placeholder1"); a.setPlaceid("id2"); a.setType(Attraction.AttractionType.LOCAL_SEE); a.setId(7);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Society for the Prevention of Cruelty to Animals SPCA"); a.setDescription("placeholder2"); a.setPlaceid("id3"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("Society for the Prevention of Cruelty to Animals SPCA"); a.setDescription("placeholder2"); a.setPlaceid("id3"); a.setType(Attraction.AttractionType.LOCAL_SEE); a.setId(8);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Save Our Street Dogs SOSD Singapore"); a.setDescription("placedholder3"); a.setPlaceid("id4"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("Save Our Street Dogs SOSD Singapore"); a.setDescription("placedholder3"); a.setPlaceid("id4"); a.setType(Attraction.AttractionType.LOCAL_SEE); a.setId(9);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Oasis Second Chance Animal Shelter OSCAS"); a.setDescription("placedholder4"); a.setPlaceid("id5"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("Oasis Second Chance Animal Shelter OSCAS"); a.setDescription("placedholder4"); a.setPlaceid("id5"); a.setType(Attraction.AttractionType.LOCAL_SEE); a.setId(10);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Animal Lovers League ALL"); a.setDescription("placedholder5"); a.setPlaceid("id6"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("Animal Lovers League ALL"); a.setDescription("placedholder5"); a.setPlaceid("id6"); a.setType(Attraction.AttractionType.LOCAL_SEE); a.setId(11);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Causes for Animals CAS"); a.setDescription("placedholder6"); a.setPlaceid("id7"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("Causes for Animals CAS"); a.setDescription("placedholder6"); a.setPlaceid("id7"); a.setType(Attraction.AttractionType.LOCAL_SEE); a.setId(12);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Action for Singapore Dogs ASD"); a.setDescription("placedholder7"); a.setPlaceid("id8"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("Action for Singapore Dogs ASD"); a.setDescription("placedholder7"); a.setPlaceid("id8"); a.setType(Attraction.AttractionType.LOCAL_SEE); a.setId(13);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("The House Rabbit Society of Singapore HRSS"); a.setDescription("placedholder8"); a.setPlaceid("id9"); a.setType(Attraction.AttractionType.LOCAL_SEE);
+            a.setName("The House Rabbit Society of Singapore HRSS"); a.setDescription("placedholder8"); a.setPlaceid("id9"); a.setType(Attraction.AttractionType.LOCAL_SEE); a.setId(14);
             db.createAttraction(a);
             attractions = db.getAttractions();
         }
         adapter = new AttractionAdapter(getActivity(),attractions);
         listView = (ListView) rootView.findViewById(R.id.attraction_list);
-        //listView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
-        //listView.setStackFromBottom(true);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener()  {
             @Override
@@ -176,6 +174,7 @@ public class AttractionListFragment extends Fragment {
                 attrIntent.putExtra("atrType",attractions.get(position).getType());
                 attrIntent.putExtra("atrPlaceid",attractions.get(position).getPlaceid()); //use this to getplacebyid
                 attrIntent.putExtra("atrInItinerary", attractions.get(position).getInItinerary());
+                attrIntent.putExtra("atrId", attractions.get(position).getId());
                 startActivity(attrIntent);
             }
         });
@@ -191,7 +190,7 @@ public class AttractionListFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                ArrayList<Attraction> Tempattractions = new ArrayList<Attraction>();
+                ArrayList<Attraction> Tempattractions = new ArrayList<>();
                 for (Attraction a:attractions){
                     if (a.getName().toLowerCase().contains(charSequence.toString().toLowerCase())){
                         Tempattractions.add(a);

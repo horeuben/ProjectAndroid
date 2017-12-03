@@ -14,6 +14,15 @@ public class Attraction {
     private AttractionType type;
     private String placeid;
     private int inItinerary; //0 = false, 1 = true
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int getInItinerary() {
         return inItinerary;
