@@ -122,7 +122,7 @@ public class AttractionListFragment extends Fragment {
             a.setName("Singapore Flyer"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_sflyer)); a.setPlaceid("ChIJ_WTZdKoZ2jERK024PgmtUrs"); a.setType(Attraction.AttractionType.LOCAL_SEE); a.setId(1);
             db.createAttraction(a);
             a = new Attraction();
-            a.setName("Vivo City"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_vivo)); a.setPlaceid("ChIJK7xLl1gZ2jERP_GdUY9XNLo"); a.setType(Attraction.AttractionType.LOCAL_MALL); a.setId(1);
+            a.setName("Vivo City"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_vivo)); a.setPlaceid("ChIJK7xLl1gZ2jERP_GdUY9XNLo"); a.setType(Attraction.AttractionType.LOCAL_MALL); a.setId(2);
             db.createAttraction(a);
             a = new Attraction();
             a.setName("Resorts World Sentosa"); a.setDescription(getActivity().getApplicationContext().getString(R.string.desc_rws)); a.setPlaceid("ChIJLR75v_0b2jERJrR28stYwMU"); a.setType(Attraction.AttractionType.HOTEL); a.setId(3);
@@ -179,9 +179,6 @@ public class AttractionListFragment extends Fragment {
             }
         });
         searchBar=(AutoCompleteTextView) rootView.findViewById(R.id.autoCompleteTextView);
-
-
-
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -235,7 +232,6 @@ public class AttractionListFragment extends Fragment {
                 }
                 if (spellCheckResult==null){
                     Toast.makeText(getActivity(),"Invalid Input",Toast.LENGTH_SHORT).show();
-                    //Log.i("attr","toasty");
                 }
                 else{
                     Toast.makeText(getActivity(),"results Input",Toast.LENGTH_SHORT).show();

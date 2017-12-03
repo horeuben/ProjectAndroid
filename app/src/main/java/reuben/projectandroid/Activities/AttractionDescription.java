@@ -27,6 +27,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -137,8 +139,6 @@ public class AttractionDescription extends AppCompatActivity implements
         });
 
         collapsingToolbarLayout.setTitle(attraction.getName());
-        mapFragment.getMapAsync(this);
-        new GetPlaceTask().execute();
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,7 +155,8 @@ public class AttractionDescription extends AppCompatActivity implements
                 }
             }
         });
-
+        mapFragment.getMapAsync(this);
+        new GetPlaceTask().execute();
     }
 
 
@@ -180,10 +181,10 @@ public class AttractionDescription extends AppCompatActivity implements
         @Override
         protected void onPreExecute() {
             //set message of the dialog
+            super.onPreExecute();
             asyncDialog.setMessage("Loading");
             //show dialog
             asyncDialog.show();
-            super.onPreExecute();
         }
 
         @Override
@@ -257,10 +258,10 @@ public class AttractionDescription extends AppCompatActivity implements
         @Override
         protected void onPreExecute() {
             //set message of the dialog
+            super.onPreExecute();
             asyncDialog.setMessage("Loading");
             //show dialog
             asyncDialog.show();
-            super.onPreExecute();
         }
 
         @Override
@@ -301,10 +302,11 @@ public class AttractionDescription extends AppCompatActivity implements
         @Override
         protected void onPreExecute() {
             //set message of the dialog
+
+            super.onPreExecute();
             asyncDialog.setMessage("Loading");
             //show dialog
             asyncDialog.show();
-            super.onPreExecute();
         }
 
         @Override

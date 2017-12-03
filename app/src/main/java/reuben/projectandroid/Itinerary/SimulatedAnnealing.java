@@ -1,5 +1,4 @@
 package reuben.projectandroid.Itinerary;
-
 import java.util.ArrayList;
 
 public class SimulatedAnnealing {
@@ -8,21 +7,23 @@ public class SimulatedAnnealing {
     private static int bestTime = -1;
     private static double bestPrice = -1;
     private static Travel bestTravel = new Travel(0);
+    private static int bestTransport;
 
     public static void simulateAnnealing(double startingTemperature, int numberOfIterations, double coolingRate, int transport, double budget) {
 
         bestTime = -1;
         bestPrice = -1;
         bestTravel = new Travel(0);
+        bestTransport = transport;
 
-        System.out.println("Budget is $" + budget);
-        System.out.println("Using transport type " + transport);
-        System.out.println("Starting SA with temperature: " + startingTemperature + ", # of iterations: " + numberOfIterations + " and cooling rate: " + coolingRate);
+//        System.out.println("Budget is $" + budget);
+//        System.out.println("Using transport type " + transport);
+//        System.out.println("Starting SA with temperature: " + startingTemperature + ", # of iterations: " + numberOfIterations + " and cooling rate: " + coolingRate);
         double t = startingTemperature;
         travel.generateInitialTravel();
         bestTime = travel.getTime(transport);
         bestPrice = travel.getPrice(transport);
-        System.out.println("Initial time for travel: " + bestTime + " minutes");
+//        System.out.println("Initial time for travel: " + bestTime + " minutes");
         Travel currentSolution = travel;
 
         for (int i = 0; i < numberOfIterations; i++) {
@@ -50,7 +51,6 @@ public class SimulatedAnnealing {
         }
 
         if (bestPrice > budget) {
-            System.out.println("Travel price over budget, using next transport alternative.");
             bestTime = -1;
             bestPrice = -1;
             bestTravel = new Travel(0);
@@ -69,6 +69,15 @@ public class SimulatedAnnealing {
 
     public static Travel getBestTravel() {
         return bestTravel;
+    }
+
+    public static String getBestTransport() {
+        if (bestTransport == 0)
+            return "Taxi";
+        else if (bestTransport == 1)
+            return "Public Transport";
+        else
+            return "Walking";
     }
 
     public static void setTravel(ArrayList<Attraction> travelList) {
@@ -95,7 +104,7 @@ public class SimulatedAnnealing {
             for (Attraction a: getBestTravel().getTravel()) {
                 System.out.print(a.getX() + " ");
             }
-            System.out.print("| " + getBestTime() + " minutes | ");
+            System.out.print("| " + getBestTime() + " minutes | Transport type: " + getBestTransport() + " | ");
             System.out.println(getBestPrice() + " SGD");
         }
         final long endTime = System.currentTimeMillis();
@@ -105,7 +114,7 @@ public class SimulatedAnnealing {
     }
 
     public static void main(String[] args) {
-        averageRunSA(1000);
+        averageRunSA(100);
     }
 
 }

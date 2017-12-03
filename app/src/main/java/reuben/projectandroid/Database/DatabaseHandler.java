@@ -20,7 +20,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private Context context;
     // All Static variables
     // Database Version
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 5;
     // Database Name
     private static final String DATABASE_NAME = "projectandroid_database";
 
@@ -42,7 +42,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_ATTRACTION_TABLE = "CREATE TABLE " + TABLE_ATTRACTIONS + "("+ KEY_PLACE_ID + " TEXT PRIMARY KEY ," + KEY_NAME + " TEXT,"+ KEY_TYPE + " TEXT,"+ KEY_DESC + " TEXT, "+ KEY_IN_ITINERARY + " INTEGER DEFAULT 0," + KEY_ID + " INTEGER DEFAULT 0" + ")";
+        String CREATE_ATTRACTION_TABLE = "CREATE TABLE " + TABLE_ATTRACTIONS + "("+ KEY_PLACE_ID + " TEXT PRIMARY KEY ," + KEY_NAME + " TEXT,"+ KEY_TYPE + " TEXT,"+ KEY_DESC + " TEXT, "+ KEY_IN_ITINERARY + " INTEGER DEFAULT 0," + KEY_ID + " INTEGER " + ")";
         db.execSQL(CREATE_ATTRACTION_TABLE);
     }
 
@@ -110,6 +110,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return db.update(TABLE_ATTRACTIONS, values, KEY_PLACE_ID + " = ?",
                 new String[] {attraction.getPlaceid() });
     }
+
     public List<Attraction> getInItinerary(){
         List<Attraction> attractions = new ArrayList<>();
 // Select All Query
@@ -127,7 +128,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 attraction.setDescription(c.getString(c.getColumnIndex(KEY_DESC)));
                 attraction.setType(Attraction.AttractionType.valueOf(c.getString(c.getColumnIndex(KEY_TYPE))));
                 attraction.setInItinerary(c.getInt(c.getColumnIndex(KEY_IN_ITINERARY)));
-                attraction.setInItinerary(c.getInt(c.getColumnIndex(KEY_ID)));
+                attraction.setId(c.getInt(c.getColumnIndex(KEY_ID)));
                 attractions.add(attraction);
 
             } while (c.moveToNext());
@@ -137,4 +138,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return attractions;
     }
 
+    public Attraction getAttractionNameFromID(int id){
+
+
+// Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE_ATTRACTIONS + " WHERE "+ KEY_ID + " = " + id ;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+        Attraction attraction = new Attraction();
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+                attraction.setPlaceid(c.getString(c.getColumnIndex(KEY_PLACE_ID)));
+                attraction.setName(c.getString(c.getColumnIndex(KEY_NAME)));
+                attraction.setDescription(c.getString(c.getColumnIndex(KEY_DESC)));
+                attraction.setType(Attraction.AttractionType.valueOf(c.getString(c.getColumnIndex(KEY_TYPE))));
+                attraction.setInItinerary(c.getInt(c.getColumnIndex(KEY_IN_ITINERARY)));
+                attraction.setInItinerary(c.getInt(c.getColumnIndex(KEY_ID)));
+        }
+        c.close();
+        db.close();
+        return attraction;
+    }
 }

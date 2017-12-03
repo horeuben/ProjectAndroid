@@ -1,5 +1,4 @@
 package reuben.projectandroid.Itinerary;
-
 import java.util.ArrayList;
 
 public class BruteForce {
@@ -8,6 +7,7 @@ public class BruteForce {
     private static int bestTime = -1;
     private static double bestPrice = -1;
     private static Travel bestTravel = new Travel(0);
+    private static int bestTransport;
 
     public static void bruteForce(ArrayList<Attraction> newList, ArrayList<Attraction> listOfAttractions, int transport) {
         if (!listOfAttractions.isEmpty()) {
@@ -35,13 +35,12 @@ public class BruteForce {
     }
 
     public static void bruteForceBudget(ArrayList<Attraction> newList, ArrayList<Attraction> listOfAttractions, int transport, double budget) {
-        System.out.println("Using transport type " + transport);
         bestTime = -1;
         bestPrice = -1;
         bestTravel = new Travel(0);
+        bestTransport = transport;
         bruteForce(newList, listOfAttractions, transport);
         if (bestPrice > budget) {
-            System.out.println("Travel price over budget, using next transport alternative.");
             bruteForceBudget(new ArrayList<Attraction>(), travel.getTravel(), transport + 1, budget);
         }
     }
@@ -56,6 +55,19 @@ public class BruteForce {
 
     public static Travel getBestTravel() {
         return bestTravel;
+    }
+
+    public static String getBestTransport() {
+        if (bestTransport == 0)
+            return "Taxi";
+        else if (bestTransport == 1)
+            return "Public Transport";
+        else
+            return "Walking";
+    }
+
+    public static Travel getTravel() {
+        return travel;
     }
 
     public static void setTravel(ArrayList<Attraction> travelList) {
@@ -81,7 +93,7 @@ public class BruteForce {
             for (Attraction a: getBestTravel().getTravel()) {
                 System.out.print(a.getX() + " ");
             }
-            System.out.print("| " + getBestTime() + " minutes | ");
+            System.out.print("| " + getBestTime() + " minutes | Transport type: " + getBestTransport() + " | ");
             System.out.println(getBestPrice() + " SGD");
         }
         final long endTime = System.currentTimeMillis();
@@ -90,6 +102,6 @@ public class BruteForce {
     }
 
     public static void main(String[] args) {
-        averageRunBF(10);
+        averageRunBF(1000);
     }
 }
