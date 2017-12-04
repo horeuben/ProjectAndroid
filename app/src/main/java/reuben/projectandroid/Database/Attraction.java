@@ -90,6 +90,8 @@ public class Attraction {
     public enum AttractionType {
         HOTEL,
         LOCAL_MALL,
-        LOCAL_SEE;
+        LOCAL_SEE,
+        LOCAL_PLAY,
+        LOCAL_ANIMAL;
     }
 }

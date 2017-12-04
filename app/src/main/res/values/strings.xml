@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ProjectAndroid</string>
+    <string name="app_name">Animap</string>
     <string name="title_activity_main">ProjectAndroid</string>
     <string name="title_attractions">Attractions</string>
     <string name="title_map">Map</string>

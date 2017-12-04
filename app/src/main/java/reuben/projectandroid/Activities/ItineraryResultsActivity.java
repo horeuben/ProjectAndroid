@@ -98,7 +98,7 @@ public class ItineraryResultsActivity extends AppCompatActivity {
                     for (int i =0;i<SimulatedAnnealing.getBestTravel().getTravel().size();i++) {
                         reuben.projectandroid.Itinerary.Attraction a= SimulatedAnnealing.getBestTravel().getTravel().get(i);
                         if(i==SimulatedAnnealing.getBestTravel().getTravel().size()-1){
-                            output+="End at "+ db.getAttractionNameFromID(a.getX()).getName()+".\n\n";
+                            output+="End at "+ db.getAttractionNameFromID(a.getX()).getName()+" and go back to start.\n\n";
                         }
                         else if (i==0){
                             output+="Start at "+ db.getAttractionNameFromID(a.getX()).getName()+",\n";
