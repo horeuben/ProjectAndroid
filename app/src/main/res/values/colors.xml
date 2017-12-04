@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3f51b5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorBackground">#fffaf0</color>
+    <color name="colorPrimary">#b47235</color>
+    <color name="colorPrimaryDark">#5f3006</color>
+    <color name="colorAccent">#b47235</color>
+    <color name="colorText">#371400</color>
     <color name="translucent_scrim_top">#26000000</color>
     <color name="translucent_scrim_top_center">#0C000000</color>
     <color name="translucent_scrim_bottom">#2A000000</color>

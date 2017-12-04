@@ -67,6 +67,10 @@ public class ItineraryAdapter extends ArrayAdapter<Attraction> {
             viewHolder.image_type.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_local_mall));
         else if(attraction.getType()== Attraction.AttractionType.LOCAL_SEE)
             viewHolder.image_type.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_local_see));
+        else if(attraction.getType()== Attraction.AttractionType.LOCAL_PLAY)
+            viewHolder.image_type.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_local_play));
+        else if(attraction.getType()== Attraction.AttractionType.LOCAL_ANIMAL)
+            viewHolder.image_type.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_local_animal));
         else
             viewHolder.image_type.setImageBitmap(BitmapFactory.decodeResource(context.getResources(),R.drawable.ic_local_mall));
 
